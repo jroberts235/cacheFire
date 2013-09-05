@@ -1,0 +1,3 @@
+A cache heater/load gem tool written in jruby and is multithreaded for speed.
+
+There are two modes to run the app in, "Scour" and "Retrieve".  Scour uses a gem called Anenome to crawl the provided URL and generate a file with *all* of the links on the site.  This can be a very long process but it is multi-threaded (default: anemone.threads = 15).  The second mode is the business end.  Retreive opens the scour.dat file and picks random links to hit.  The number of pages to Get is set at runtime with the pages option (-p, pages).  This uses the persistent/http gem so that all Gets are done over a single session. The defaul number of threads for this method is 1 but can (should) be adjusted with the threads options (-t, --threads) 
