@@ -6,19 +6,19 @@ class Options
   option :url,
     :short => "-u URL",
     :long => "--url URL",
-    :description => "URL to access",
+    :description => "URL to access (must include http://)",
     :required => true
 
   option :report,
     :short => "-R",
     :long => "--Report",
     :boolean => true,
-    :description => "Count and report the number of links in scour.dat",
+    :description => "*NOT implemented* Count and report the number of links in scour.dat",
     :default => false
 
   option :threads,
     :short => "-t threads",
-    :long => "--threads threads",
+    :long => "--threads (# of threads)",
     :description => "Number of parallel threads to use",
     :default => 1
 
@@ -38,7 +38,7 @@ class Options
 
   option :pages,
     :short => "-p pages",
-    :long => "--pages pages",
+    :long => "--pages (# of pages)",
     :description => "Number of pages to retrieve",
     :default => 100
 

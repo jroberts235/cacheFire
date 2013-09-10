@@ -73,8 +73,8 @@ begin
     tasks = [] # array to track threads
     puts "Getting #{numberOfpagesToGet} pages using #{threads} thread(s)."
 
-    (numberOfpagesToGet/threads).times do # why devide here???
-      threads.times do |t|
+    (numberOfpagesToGet/threads).times do 
+      threads.times do 
         task = FutureTask.new(Job.new(h, url, linkPool))
         executor.execute(task)
         tasks << task
@@ -85,11 +85,12 @@ begin
         t.get
       end
     end
-    $progressbar.finish
+
+    #$progressbar.finish
     puts "Cache-Hits: #{linkPool.hits}"
     puts "Cache-Miss: #{linkPool.total - linkPool.hits}"
   end
 ensure 
-  executor.shutdown()
-  $log.close
+  executor.shutdown() if options.config[:retrieve]
+  $log.close if $log
 end
