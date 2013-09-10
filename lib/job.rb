@@ -1,34 +1,28 @@
 require 'java'
+require 'persistent_http'
 
-# 'java_import' is used to import java classes
 java_import 'java.util.concurrent.Callable'
-java_import 'java.util.concurrent.FutureTask'
-java_import 'java.util.concurrent.LinkedBlockingQueue'
-java_import 'java.util.concurrent.ThreadPoolExecutor'
-java_import 'java.util.concurrent.TimeUnit'
 
 class Job
   include Callable
-  def initialize(h,uri,c,s)
-    @h   = h
-    @uri = uri
-    @counter = c
-    @skip = s
+  def initialize(http_connection, url, linkPool)
+    @h        = http_connection
+    @url      = url
+    @linkPool = linkPool
   end
   def call
-    r = @h.request(Net::HTTP::Get.new(@uri))
+    uri = @linkPool.pool.sample
+    r = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
 
-    $log.info("getting #{@uri.chomp}")
+    $log.info("getting #{uri.chomp}")
     $progressbar.increment
 
     if r.get_fields('X-Cache').include?("HIT")
       $log.info("Cache hit!")
-      @skip.add(@uri) # add to skip array
-      @counter.total_incr
-      @counter.hits_incr
+      @linkPool.total_incr
+      @linkPool.hits_incr
     else
-      @skip.add(@uri) # add to skip array
-      @counter.total_incr
+      @linkPool.total_incr
     end
   end
-end # Class end
+end

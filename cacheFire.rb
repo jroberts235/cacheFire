@@ -1,27 +1,26 @@
 #! env jruby
 $LOAD_PATH << './lib'
 
-require 'anemone'
 require 'ruby-progressbar'
 require 'logger'
-require 'persistent_http'
-require 'mixlib/cli'
 require 'java'
-require 'cachewarmer.rb'
-require 'counter.rb'     
+require 'crawl.rb'
+require 'options.rb'
+require 'linkpool.rb'     
 require 'job.rb'         
-require 'skip.rb'
+
+java_import 'java.util.concurrent.FutureTask'
+java_import 'java.util.concurrent.LinkedBlockingQueue'
+java_import 'java.util.concurrent.ThreadPoolExecutor'
+java_import 'java.util.concurrent.TimeUnit'
 
 begin
+  options = Options.new
+  options.parse_options
 
-  # call CacheWarmer and parse options
-  cw = CacheWarmer.new
-  cw.parse_options
-
-  # handle the attrs passed at runtime
-                 url = cw.config[:url]
-             threads = cw.config[:threads].to_i
-  numberOfpagesToGet = cw.config[:pages].to_i
+                 url = options.config[:url]
+             threads = options.config[:threads].to_i
+  numberOfpagesToGet = options.config[:pages].to_i
 
   # create a thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
@@ -35,36 +34,30 @@ begin
   $log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
 
-  # Scour
+  # Scour Mode
   # crawl URL and generate scour.dat file if asked to
-  if cw.config[:scour]
+  if options.config[:scour]
     puts "Crawling #{url} looking for links..."
+    
+    Crawl.new(url)
 
-    # some eye candy while you wait
-    $progressbar = ProgressBar.create(:starting_at => 20, 
-                                      :total => nil)
-    cw.crawlAndWriteScourFile(url) 
     puts "Done! Now you can run in Retrieve mode."
   end
 
-  # Retrieve
+
+  # Retrieve Mode
   # use the scour.dat file to GET random pages from URL 
   # URI's will only be loaded once
-  if cw.config[:retrieve]
+  if options.config[:retrieve]
 
-    # some eye candy while you wait
+    raise 'File scour.dat cannot be found!' unless File.exists?('scour.dat')
+
     $progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
                                    :starting_at => 0,
                                    :total => numberOfpagesToGet,
-                                   :smoothing => 0.8) unless cw.config[:report] 
+                                   :smoothing => 0.8) unless options.config[:report] 
 
-    raise 'File scour.dat cannot be found!' unless File.exists?('scour.dat')
-    
-    allLinksFromFile = cw.readScourfile
-    exit if cw.config[:report]
-
-    puts "Getting #{numberOfpagesToGet} pages using #{threads} thread(s)."
-
+    # setup peristent connection to url
     h = PersistentHTTP.new(
         :name         => 'cacheFire',
         :pool_size    => 1024,
@@ -74,15 +67,15 @@ begin
         :url          => url
     )
 
-    tasks = [] # array to track threads
-    s = Skip.new # method to track URI's that have been called
-    c = Counter.new # counter method for cache hits and misses
+    linkPool = LinkPool.new # class for pool mngmt / cache hits and misses
+    linkPool.read
 
-    (numberOfpagesToGet/threads).times do
+    tasks = [] # array to track threads
+    puts "Getting #{numberOfpagesToGet} pages using #{threads} thread(s)."
+
+    (numberOfpagesToGet/threads).times do # why devide here???
       threads.times do |t|
-        uri = "#{url}/#{allLinksFromFile.sample}"
-        #next if (s.cached).include?(uri) # skip if hit previously
-        task = FutureTask.new(Job.new(h,uri,c,s))
+        task = FutureTask.new(Job.new(h, url, linkPool))
         executor.execute(task)
         tasks << task
       end
@@ -93,9 +86,8 @@ begin
       end
     end
     $progressbar.finish
-    # report counter stats
-    puts "Cache-Hits: #{c.hits}"
-    puts "Cache-Miss: #{c.total - c.hits}"
+    puts "Cache-Hits: #{linkPool.hits}"
+    puts "Cache-Miss: #{linkPool.total - linkPool.hits}"
   end
 ensure 
   executor.shutdown()
