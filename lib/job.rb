@@ -5,7 +5,7 @@ java_import 'java.util.concurrent.Callable'
 
 class Job
   include Callable
-  def initialize(http_connection, url, linkPool)
+  def initialize(http_connection, url, linkPool, progressbar)
     @h        = http_connection
     @url      = url
     @linkPool = linkPool
@@ -15,7 +15,7 @@ class Job
     r = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
 
     $log.info("getting #{uri.chomp}")
-    $progressbar.increment
+    progressbar.increment
 
     if r.get_fields('X-Cache').include?("HIT")
       $log.info("Cache hit!")

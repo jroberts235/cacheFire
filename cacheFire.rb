@@ -52,7 +52,7 @@ begin
 
     raise 'File scour.dat cannot be found!' unless File.exists?('scour.dat')
 
-    $progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
+    progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
                                    :starting_at => 0,
                                    :total => numberOfpagesToGet,
                                    :smoothing => 0.8) unless options.config[:report] 
@@ -75,7 +75,7 @@ begin
 
     (numberOfpagesToGet/threads).times do 
       threads.times do 
-        task = FutureTask.new(Job.new(h, url, linkPool))
+        task = FutureTask.new(Job.new(h, url, linkPool, progressbar))
         executor.execute(task)
         tasks << task
       end
@@ -86,7 +86,7 @@ begin
       end
     end
 
-    #$progressbar.finish
+    progressbar.finish
     puts "Cache-Hits: #{linkPool.hits}"
     puts "Cache-Miss: #{linkPool.total - linkPool.hits}"
   end
