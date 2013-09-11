@@ -1,7 +1,7 @@
 require 'anemone'
 
 class Crawl
-  def initialize(url)
+  def initialize(url, threads)
     links = []
 
     dataFile = File.new "scour.dat","w"
@@ -10,7 +10,7 @@ class Crawl
     progressbar = ProgressBar.create(:starting_at => 20,
                                       :total => nil)
     Anemone.crawl(url) do |anemone|
-      anemone.threads = 15
+      anemone.threads = threads
       anemone.on_every_page do |page|
         (page.links).each do |link|
           unless links.include?(link) and link != nil

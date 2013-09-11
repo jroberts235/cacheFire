@@ -39,7 +39,7 @@ begin
   if options.config[:scour]
     puts "Crawling #{url} looking for links..."
     
-    Crawl.new(url)
+    Crawl.new(url, threads)
 
     puts "Done! Now you can run in Retrieve mode."
   end
