@@ -20,7 +20,8 @@ begin
 
                  url = options.config[:url]
              threads = options.config[:threads].to_i
-  numberOfpagesToGet = options.config[:pages].to_i
+          pagesToGet = options.config[:pages].to_i
+              target = options.config[:target].to_i
 
   # create a thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
@@ -49,13 +50,15 @@ begin
   # use the scour.dat file to GET random pages from URL 
   # URI's will only be loaded once
   if options.config[:retrieve]
-
-    raise 'File scour.dat cannot be found!' unless File.exists?('scour.dat')
+    raise 'File scour.dat missing. Run in scour mode to create it.' unless File.exists?('scour.dat')
 
     progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
-                                   :starting_at => 0,
-                                   :total => numberOfpagesToGet,
-                                   :smoothing => 0.8) unless options.config[:report] 
+                                     :starting_at => 0,
+                                     :total => pagesToGet,
+                                     :smoothing => 0.8) unless options.config[:target] 
+
+    progressbar = ProgressBar.create(:starting_at => 20,
+                                      :total => nil) if options.config[:target]
 
     # setup peristent connection to url
     h = PersistentHTTP.new(
@@ -71,25 +74,47 @@ begin
     linkPool.read
 
     tasks = [] # array to track threads
-    puts "Getting #{numberOfpagesToGet} pages using #{threads} thread(s)."
 
-    (numberOfpagesToGet/threads).times do 
-      threads.times do 
-        task = FutureTask.new(Job.new(h, url, linkPool, progressbar))
+    # loop through the pool, either using target or # of pages.
+    if options.config[:target]
+
+      linkPool.stats # update the ratio
+      puts "Pulling random pages until the cache ratio is #{target}"
+      while linkPool.ratio <= target  do 
+        task = FutureTask.new(Job.new(h, url, linkPool, progressbar, options))
         executor.execute(task)
         tasks << task
+        linkPool.stats # update the ratio
       end
 
-      # wait for all threads to complete
       tasks.each do |t|
         t.get
       end
+
+    else
+
+      puts "Getting #{pagesToGet} pages using #{threads} thread(s)."
+      (pagesToGet/threads).times do
+        threads.times do
+          task = FutureTask.new(Job.new(h, url, linkPool, progressbar, options))
+          executor.execute(task)
+          tasks << task
+        end
+
+        tasks.each do |t|
+          t.get
+        end
+      end
+
     end
+    # end of looping
 
     progressbar.finish
+    linkPool.stats
+
     puts "Cache-Hits:     #{linkPool.hits}"
     puts "Cache-Miss:     #{linkPool.total - linkPool.hits}"
-    puts "Hit/Miss Ratio: #{((linkPool.hits.to_f / linkPool.total.to_f) * 100).to_i}%"
+    puts "Hit/Miss Ratio: #{linkPool.ratio}%"
   end
 ensure 
   executor.shutdown() if options.config[:retrieve]

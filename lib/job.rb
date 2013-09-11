@@ -5,25 +5,27 @@ java_import 'java.util.concurrent.Callable'
 
 class Job
   include Callable
-  def initialize(http_connection, url, linkPool, progressbar)
-    @h        = http_connection
+  def initialize(conn_handle, url, linkPool, progressbar, options)
+    @h        = conn_handle
     @url      = url
     @linkPool = linkPool
+    @options  = options
     @progressbar = progressbar
   end
   def call
+    raise 'Pool exhausted!' if @linkPool.pool.count == 0
     uri = @linkPool.pool.sample
-    r = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
+    req = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
+
+    @progressbar.increment
+    @linkPool.total_incr
+    @linkPool.remove(uri) if @options.config[:purge]
 
     $log.info("getting #{uri.chomp}")
-    @progressbar.increment
 
-    if r.get_fields('X-Cache').include?("HIT")
-      $log.info("Cache hit!")
-      @linkPool.total_incr
+    if req.get_fields('X-Cache').include?("HIT")
+      $log.info("Cache hit")
       @linkPool.hits_incr
-    else
-      @linkPool.total_incr
     end
   end
 end

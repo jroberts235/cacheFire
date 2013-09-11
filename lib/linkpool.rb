@@ -2,11 +2,12 @@ $LOAD_PATH << './'
 require 'readfile.rb'
 
 class LinkPool
-  attr_accessor( :total, :hits, :pool )
+  attr_accessor( :total, :hits, :ratio, :pool )
   def initialize
-    @total  = 0
-    @hits   = 0
-    @pool   = [] 
+    @total = 0
+    @hits  = 0
+    @ratio = 0
+    @pool  = [] 
   end
   def read
     # Call readfile and populate the links array
@@ -20,7 +21,11 @@ class LinkPool
   def hits_incr
     @hits  += 1
   end
-  def remove(uri_to_remove_from_pool)
-    @pool.delete(uri_to_remove_from_pool) 
+  def stats
+    @ratio = ((self.hits.to_f / self.total.to_f) * 100).to_i
+  end
+  def remove(uri)
+    @pool.delete(uri) 
+    $log.info("#{uri.chomp} - Purged from pool. Pool size: #{@pool.count}")
   end
 end
