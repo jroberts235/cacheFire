@@ -87,8 +87,9 @@ begin
     end
 
     progressbar.finish
-    puts "Cache-Hits: #{linkPool.hits}"
-    puts "Cache-Miss: #{linkPool.total - linkPool.hits}"
+    puts "Cache-Hits:     #{linkPool.hits}"
+    puts "Cache-Miss:     #{linkPool.total - linkPool.hits}"
+    puts "Hit/Miss Ratio: #{(linkPool.hits.to_f / linkPool.total.to_f) * 100}%"
   end
 ensure 
   executor.shutdown() if options.config[:retrieve]

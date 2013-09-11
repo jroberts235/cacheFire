@@ -9,13 +9,14 @@ class Job
     @h        = http_connection
     @url      = url
     @linkPool = linkPool
+    @progressbar = progressbar
   end
   def call
     uri = @linkPool.pool.sample
     r = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
 
     $log.info("getting #{uri.chomp}")
-    progressbar.increment
+    @progressbar.increment
 
     if r.get_fields('X-Cache').include?("HIT")
       $log.info("Cache hit!")
