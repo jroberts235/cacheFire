@@ -20,8 +20,13 @@ begin
 
                  url = options.config[:url]
              threads = options.config[:threads].to_i
-          pagesToGet = options.config[:pages].to_i
-              target = options.config[:target].to_i
+          pagesToGet = options.config[:pages].to_i unless options.config[:target]
+
+          if options.config[:target]
+            target = options.config[:target].to_i
+            raise 'You must supply a target value greater than 0' unless target > 0
+            target.to_i
+          end
 
   # create a thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads

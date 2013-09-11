@@ -32,7 +32,8 @@ class Options
   option :target,
     :short => "-T",
     :long => "--target",
-    :description => "Don't bother with page count, randomly load all pages until cache hit/miss ratio = value (default 75%)"
+    :description => "Don't bother with page count, randomly load all pages until cache hit/miss ratio = value",
+    :default => 75
 
   option :scour,
     :short => "-s",
