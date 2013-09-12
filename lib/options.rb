@@ -17,24 +17,10 @@ class Options
     :default => false
 
   option :threads,
-    :short => "-t",
+    :short => "-t threads",
     :long => "--threads (# of threads)",
     :description => "Number of parallel threads to use",
     :default => 1
-
-  option :purge,
-    :short => "-P",
-    :long => "--purge",
-    :boolean => true,
-    :description => "Purge links from pool after they report being a chache hit",
-    :default => false
-
-  option :target,
-    :short => "-T",
-    :long => "--target",
-    :boolean => true,
-    :description => "Don't bother with page count, randomly load all pages until cache hit/miss ratio = value",
-    :default => false
 
   option :scour,
     :short => "-s",
