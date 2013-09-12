@@ -8,6 +8,7 @@ class Crawl
     dataFile.close
 
     progressbar = ProgressBar.create(:starting_at => 20,
+                                      :format => '%a',
                                       :total => nil)
     Anemone.crawl(url) do |anemone|
       anemone.threads = threads
