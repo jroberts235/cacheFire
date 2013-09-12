@@ -75,7 +75,7 @@ begin
 
     (numberOfpagesToGet/threads).times do 
       threads.times do 
-        task = FutureTask.new(Job.new(h, url, linkPool, progressbar))
+        task = FutureTask.new(Job.new(h, url, linkPool, progressbar, options))
         executor.execute(task)
         tasks << task
       end
