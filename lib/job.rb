@@ -13,19 +13,18 @@ class Job
     @progressbar = progressbar
   end
   def call
-    raise 'Pool exhausted!' if @linkPool.pool.count == 0
     uri = @linkPool.pool.sample
     req = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
 
     @progressbar.increment
     @linkPool.total_incr
-    @linkPool.remove(uri) if @options.config[:purge]
-
-    $log.info("getting #{uri.chomp}")
 
     if req.get_fields('X-Cache').include?("HIT")
-      $log.info("Cache hit")
+      $log.info("Hit: #{uri.chomp}")
       @linkPool.hits_incr
+      @linkPool.remove(uri) if @options.config[:prune]
+    else
+      $log.info("Miss: #{uri.chomp}")
     end
   end
 end

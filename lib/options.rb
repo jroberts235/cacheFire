@@ -9,16 +9,9 @@ class Options
     :description => "URL to access (must include http://)",
     :required => true
 
-  option :report,
-    :short => "-R",
-    :long => "--Report",
-    :boolean => true,
-    :description => "*NOT implemented* Count and report the number of links in scour.dat",
-    :default => false
-
   option :threads,
-    :short => "-t threads",
-    :long => "--threads (# of threads)",
+    :short => "-t number",
+    :long => "--threads number",
     :description => "Number of parallel threads to use",
     :default => 1
 
@@ -36,11 +29,24 @@ class Options
     :description => "Read the data from scour.dat and pick random URLs to hit",
     :default => false
 
-  option :pages,
-    :short => "-p pages",
-    :long => "--pages (# of pages)",
-    :description => "Number of pages to retrieve",
+  option :links,
+    :short => "-l number",
+    :long => "--links number",
+    :description => "Number of links to retrieve",
     :default => 100
+
+  option :prune,
+    :short => "-p",
+    :long => "--prune",
+    :boolean => true,
+    :description => "Get every link only once",
+    :default => false
+ 
+  option :port,
+    :short => "-P number",
+    :long => "--Port number",
+    :description => "Port to connect to",
+    :default => 80
 
   option :help,
     :long => "--help",

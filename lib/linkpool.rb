@@ -14,13 +14,18 @@ class LinkPool
     r.open # open the file for reading
     @pool = r.lines
   end
+  def reload
+    self.read
+  end
   def total_incr
     @total += 1
   end
   def hits_incr
     @hits  += 1
   end
-  def remove(uri_to_remove_from_pool)
-    @pool.delete(uri_to_remove_from_pool) 
+  def remove(uri)
+    @pool.delete(uri) 
+    $log.info("removing #{uri.chomp}")
+    $log.info("Pool Size: #{@pool.count}")
   end
 end

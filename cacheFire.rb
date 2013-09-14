@@ -19,13 +19,14 @@ begin
   options.parse_options
 
                  url = options.config[:url]
+                port = options.config[:port]
              threads = options.config[:threads].to_i
-  numberOfpagesToGet = options.config[:pages].to_i
+               links = options.config[:links].to_i
 
   # create a thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
                                     256, # max_pool_threads
-                                    5,  # keep_alive_time
+                                    2,  # keep_alive_time
                                     TimeUnit::SECONDS,
                                     LinkedBlockingQueue.new)
 
@@ -46,7 +47,7 @@ begin
 
 
   # Retrieve Mode
-  # use the scour.dat file to GET random pages from URL 
+  # use the scour.dat file to GET random links from URL 
   # URI's will only be loaded once
   if options.config[:retrieve]
 
@@ -54,30 +55,33 @@ begin
 
     progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
                                    :starting_at => 0,
-                                   :total => numberOfpagesToGet,
+                                   :total => links,
                                    :smoothing => 0.8) unless options.config[:report] 
 
     # setup peristent connection to url
     h = PersistentHTTP.new(
         :name         => 'cacheFire',
         :pool_size    => 1024,
-        :pool_timeout => 5,
+        :pool_timeout => 2,
         :warn_timeout => 0.25,
         :force_retry  => true,
-        :url          => url
+        :url          => url,
+        :port         => port
     )
 
     linkPool = LinkPool.new # class for pool mngmt / cache hits and misses
     linkPool.read
 
     tasks = [] # array to track threads
-    puts "Getting #{numberOfpagesToGet} pages using #{threads} thread(s)."
+    puts "Getting #{links} links using #{threads} thread(s)."
 
-    (numberOfpagesToGet/threads).times do 
-      threads.times do 
-        task = FutureTask.new(Job.new(h, url, linkPool, progressbar, options))
-        executor.execute(task)
-        tasks << task
+    (links/threads).times do 
+      if linkPool.pool.count >= 1
+        threads.times do 
+          task = FutureTask.new(Job.new(h, url, linkPool, progressbar, options))
+          executor.execute(task)
+          tasks << task
+        end
       end
 
       # wait for all threads to complete
