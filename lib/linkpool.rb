@@ -15,7 +15,7 @@ class LinkPool
     # Call readfile and populate the links array
     r = ReadFile.new( @options )
     r.open # open the file for reading
-    @pool = r.lines.uniq
+    @pool = r.lines.uniq #de-dupe
   end
   def reload
     self.read

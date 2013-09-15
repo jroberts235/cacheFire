@@ -5,12 +5,11 @@ java_import 'java.util.concurrent.Callable'
 
 class Job
   include Callable
-  def initialize(conn_handle, url, linkPool, progressbar, options)
+  def initialize(conn_handle, url, linkPool, options)
     @h        = conn_handle
     @url      = url
     @linkPool = linkPool
     @options  = options
-    @progressbar = progressbar
   end
   def call
     uri = @linkPool.pool.sample

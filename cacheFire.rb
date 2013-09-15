@@ -20,17 +20,17 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
   progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
                                    :starting_at => 0,
                                    :total => links,
-                                   :smoothing => 0.8) 
+                                   :smoothing => 0.8) unless quiet
 
   tasks = [] # array to track threads
 
   (links/threads).times do
     if linkPool.pool.count >= 1
       threads.times do
-        task = FutureTask.new(Job.new(h, url, linkPool, progressbar, options))
+        task = FutureTask.new(Job.new(h, url, linkPool, options))
         executor.execute(task)
         tasks << task
-        progressbar.increment
+        progressbar.increment unless quiet
       end
     end
 
@@ -41,7 +41,7 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
    end
 
    # finish with some stats
-   unless options.config[:quiet]
+   unless quiet
      linkPool.calc_ratio
      puts "\nCache-Hits:     #{linkPool.hits}"
      puts "Cache-Miss:     #{linkPool.total - linkPool.hits}"
@@ -50,20 +50,23 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
 end
 
 def run_targeted(executor, ratio, threads, h, url, linkPool, options)
+
+  raise "Targeted mode requires that varnish be installed locally" unless File.exist?('/usr/bin/varnishstat')
+
   progressbar = ProgressBar.create(:format => '%a %w',
                                    :starting_at => 0,
                                    :total => 100,
-                                   :smoothing => 0.8)
+                                   :smoothing => 0.8) unless quiet
 
   tasks = [] # array to track threads
 
   until varnishRatio >= ratio do
     threads.times do
-      task = FutureTask.new(Job.new(h, url, linkPool, progressbar, options))
+      task = FutureTask.new(Job.new(h, url, linkPool, options))
       executor.execute(task)
       tasks << task
     end
-    progressbar.progress= varnishRatio
+    progressbar.progress= varnishRatio unless quiet
 
     if linkPool.pool.count < threads
       linkPool.reload
@@ -84,6 +87,7 @@ begin
                 port = options.config[:port]
              threads = options.config[:threads].to_i
                links = options.config[:links].to_i
+               quiet = options.config[:quiet]
 
   # create a thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
@@ -100,11 +104,11 @@ begin
   # Scour Mode
   # crawl URL and generate scour.dat file if asked to
   if options.config[:scour]
-    puts "Crawling #{url} looking for links..." unless options.config[:quiet]
+    puts "Crawling #{url} looking for links..." unless quiet
     
     Crawl.new(url, threads)
 
-    puts "Done! Now you can run in Retrieve mode." unless options.config[:quiet]
+    puts "Done! Now you can run in Retrieve mode." unless quiet
   end
 
 
@@ -131,10 +135,10 @@ begin
 
     if options.config[:targeted]
       ratio = options.config[:targeted].to_i
-      puts "Heating cache to #{ratio}% using #{threads} thread(s)." unless options.config[:quiet]
+      puts "Heating cache to #{ratio}% using #{threads} thread(s)." unless quiet
       run_targeted(executor, ratio, threads, h, url, linkPool, options)
     else
-      puts "Getting #{links} links using #{threads} thread(s)." unless options.config[:quiet]
+      puts "Getting #{links} links using #{threads} thread(s)." unless quiet
       run_standard(executor, links, threads, h, url, linkPool, options)
     end
 
