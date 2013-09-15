@@ -1,7 +1,8 @@
 class ReadFile
   attr_accessor :lines
-  def initialize
+  def initialize( options )
     @lines = []
+    @options = options
   end
   def open
 
@@ -14,7 +15,7 @@ class ReadFile
     msg = "Read #{@lines.count} lines from dat file\n"
     msg << "De-duping... #{@lines.uniq.count} remaining\n"
 
-    puts msg
+    puts msg unless @options.config[:quiet]
     $log.info(msg)
   end
 end

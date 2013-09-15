@@ -16,7 +16,6 @@ class Job
     uri = @linkPool.pool.sample
     req = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
 
-    @progressbar.increment
     @linkPool.total_incr
 
     if req.get_fields('X-Cache').include?("HIT")

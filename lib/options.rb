@@ -22,6 +22,12 @@ class Options
     :description => "scour URL and build data file?",
     :default => false
 
+  option :targeted,
+    :short => "-T number",
+    :long => "--targeted number",
+    :description => "Pull links until the Hit/Miss ratio reaches the specified amnt",
+    :default => nil
+
   option :retrieve,
     :short => "-r",
     :long => "--retrieve",
@@ -47,6 +53,13 @@ class Options
     :long => "--Port number",
     :description => "Port to connect to",
     :default => 80
+
+  option :quiet,
+    :short => "-q",
+    :long => "--quiet",
+    :boolean => true,
+    :description => "quit mode",
+    :default => false
 
   option :help,
     :long => "--help",
