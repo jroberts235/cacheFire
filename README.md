@@ -20,17 +20,19 @@ REQUIRES:
 
 jruby, java and the bundler gem.
 
+
 INSTALL: 
 
 rvm install jruby
 git clone git@github.com:jroberts235/cacheFire.git
 cd cacheFire ; bundler 
 
+
 USAGE:
 
 jruby ./cacheFire.rb -u http://YOUR.SITE -s             Scour the site and find all links
-jruby ./cacheFire.rb -u http://YOUR.SITE -r -l 10000    Retrieve all links randomly 10000 times
-jruby ./cacheFire.rb -u http://YOUR.SITE -r -p -T 85    Get very link until cache is 85% hot
+jruby ./cacheFire.rb -u http://YOUR.SITE -r -l 10000    Retrieve links randomly 10000 times
+jruby ./cacheFire.rb -u http://YOUR.SITE -r -p -T 85    Get every link until cache is 85% hot
 
 
 Caveats:
