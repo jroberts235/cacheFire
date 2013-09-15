@@ -20,7 +20,7 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
   progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
                                    :starting_at => 0,
                                    :total => links,
-                                   :smoothing => 0.8) unless quiet
+                                   :smoothing => 0.8) unless options.config[:quiet]
 
   tasks = [] # array to track threads
 
@@ -30,7 +30,7 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
         task = FutureTask.new(Job.new(h, url, linkPool, options))
         executor.execute(task)
         tasks << task
-        progressbar.increment unless quiet
+        progressbar.increment unless options.config[:quiet]
       end
     end
 
@@ -41,7 +41,7 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
    end
 
    # finish with some stats
-   unless quiet
+   unless options.config[:quiet]
      linkPool.calc_ratio
      puts "\n"
      puts "Cache-Hits:     #{linkPool.hits}"
@@ -56,7 +56,7 @@ def run_targeted(executor, ratio, threads, h, url, linkPool, options)
   progressbar = ProgressBar.create(:format => '%a %w',
                                    :starting_at => 0,
                                    :total => 100,
-                                   :smoothing => 0.8) unless quiet
+                                   :smoothing => 0.8) unless options.config[:quiet]
 
   tasks = [] # array to track threads
 
@@ -66,7 +66,7 @@ def run_targeted(executor, ratio, threads, h, url, linkPool, options)
       executor.execute(task)
       tasks << task
     end
-    progressbar.progress= varnishRatio unless quiet
+    progressbar.progress= varnishRatio unless options.config[:quiet]
 
     if linkPool.pool.count < threads
       linkPool.reload
@@ -87,7 +87,6 @@ begin
                 port = options.config[:port]
              threads = options.config[:threads].to_i
                links = options.config[:links].to_i
-               quiet = options.config[:quiet]
 
   # create the thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
@@ -104,10 +103,10 @@ begin
   # Scour Mode
   # crawl URL and generate scour.dat file if asked to
   if options.config[:scour]
-    puts "Crawling #{url} looking for links..." unless quiet
+    puts "Crawling #{url} looking for links..." unless options.config[:quiet]
     Crawl.new(url, threads, options)
     linkPool = LinkPool.new(options)
-    puts "The scour.dat file contains #{linkPool.count} entries." unless quiet
+    puts "The scour.dat file contains #{linkPool.count} entries." unless options.config[:quiet]
   end
 
 
@@ -132,10 +131,10 @@ begin
 
     if options.config[:targeted]
       ratio = options.config[:targeted].to_i
-      puts "Heating cache to #{ratio}% using #{threads} thread(s)." unless quiet
+      puts "Heating cache to #{ratio}% using #{threads} thread(s)." unless options.config[:quiet]
       run_targeted(executor, ratio, threads, h, url, linkPool, options)
     else
-      puts "Getting #{links} links using #{threads} thread(s)." unless quiet
+      puts "Getting #{links} links using #{threads} thread(s)." unless options.config[:quiet]
       run_standard(executor, links, threads, h, url, linkPool, options)
     end
 
