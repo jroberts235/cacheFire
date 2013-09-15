@@ -9,18 +9,18 @@ class LinkPool
     @hits    = 0
     @ratio   = 0
     @count   = 0
-    @pool    = ThreadSafe::Array.new
+    @pool    = ThreadSafe::Hash.new
     @options = options
   end
   def read
-    # Call readfile and populate the links array
+    # Call readfile and populate the links Hash
     r = ReadFile.new( @options )
     r.open # open the file for reading
-    @pool = r.lines.uniq #de-dupe
+    @pool = r.lines
   end
   def count
     self.read
-    @count = @pool.count
+    @count = @pool.keys.count
   end
   def reload
     self.read
@@ -38,6 +38,6 @@ class LinkPool
   def remove(uri)
     @pool.delete(uri) 
     $log.info("removing #{uri.chomp}")
-    $log.info("Pool Size: #{@pool.count}")
+    $log.info("Pool Size: #{@pool.key.count}")
   end
 end

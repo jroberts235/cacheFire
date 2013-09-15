@@ -7,11 +7,10 @@ def run_targeted(executor, ratio, threads, h, url, linkPool, options)
                                    :smoothing => 0.8) unless options.config[:quiet]
 
   tasks = [] # array to track threads
-  uri = @linkPool.pool.sample
 
   until varnishRatio >= ratio do
     threads.times do
-      task = FutureTask.new(Job.new(h, url, uri, linkPool, options))
+      task = FutureTask.new(Job.new(h, url, linkPool, options))
       executor.execute(task)
       linkPool.total_incr
       tasks << task
