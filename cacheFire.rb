@@ -50,7 +50,6 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
 end
 
 def run_targeted(executor, ratio, threads, h, url, linkPool, options)
-
   raise "Targeted mode requires that varnish be installed locally" unless File.exist?('/usr/bin/varnishstat')
 
   progressbar = ProgressBar.create(:format => '%a %w',
@@ -106,7 +105,7 @@ begin
   if options.config[:scour]
     puts "Crawling #{url} looking for links..." unless quiet
     
-    Crawl.new(url, threads)
+      Crawl.new(url, threads)
 
     puts "Done! Now you can run in Retrieve mode." unless quiet
   end
@@ -114,7 +113,6 @@ begin
 
   # Retrieve Mode
   # use the scour.dat file to GET random links from URL 
-  # URI's will only be loaded once
   if options.config[:retrieve]
 
     raise 'File scour.dat cannot be found!' unless File.exists?('scour.dat')
