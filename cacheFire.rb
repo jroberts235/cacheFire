@@ -43,7 +43,8 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
    # finish with some stats
    unless quiet
      linkPool.calc_ratio
-     puts "\nCache-Hits:     #{linkPool.hits}"
+     puts "\n"
+     puts "Cache-Hits:     #{linkPool.hits}"
      puts "Cache-Miss:     #{linkPool.total - linkPool.hits}"
      puts "Hit/Miss Ratio: #{linkPool.ratio}%"
    end
@@ -90,8 +91,8 @@ begin
 
   # create the thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
-                                    256, # max_pool_threads
-                                    5,  # keep_alive_time
+                                    256,     # max_pool_threads
+                                    5,       # keep_alive_time
                                     TimeUnit::SECONDS,
                                     LinkedBlockingQueue.new)
 

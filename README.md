@@ -1,7 +1,7 @@
 ~ cacheFire ~
 
-A cache heater/load gen tool written in jruby and is multithreaded for better performance.
-There are three modes to run the app in, "Scour", "Retrieve" and "Targetd Rerieve".  
+A cache heater/load gen tool written in jruby and that is multithreaded for better performance.
+There are three modes to run the app in, "Scour", "Retrieve" and "Targetd Retrieve".  
 
 
 Scour:  uses a gem called Anenome to crawl the provided URL and generate a file with *all* of the links on the site.  This can be a very long process but it is multi-threaded (default: = 1) so you should definately make use of the "-t, --threads" option.  You can manipulate the scour.dat file by hand to remove any link that you want to skip for what ever reason but don't worry about duplicate entries, they're handled by the app.
