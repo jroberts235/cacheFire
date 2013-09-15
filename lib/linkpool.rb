@@ -3,11 +3,12 @@ require 'readfile.rb'
 require 'thread_safe'
 
 class LinkPool
-  attr_accessor( :total, :hits, :ratio, :pool )
+  attr_accessor( :count, :total, :hits, :ratio, :pool )
   def initialize( options )
     @total   = 0
     @hits    = 0
     @ratio   = 0
+    @count   = 0
     @pool    = ThreadSafe::Array.new
     @options = options
   end
@@ -16,6 +17,10 @@ class LinkPool
     r = ReadFile.new( @options )
     r.open # open the file for reading
     @pool = r.lines.uniq #de-dupe
+  end
+  def count
+    self.read
+    @count = @pool.count
   end
   def reload
     self.read

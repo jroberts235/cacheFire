@@ -81,21 +81,21 @@ end
 begin
   options = Options.new
   options.parse_options
-
+       
                  url = options.config[:url]
                 port = options.config[:port]
              threads = options.config[:threads].to_i
                links = options.config[:links].to_i
                quiet = options.config[:quiet]
 
-  # create a thread pool
+  # create the thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
                                     256, # max_pool_threads
                                     5,  # keep_alive_time
                                     TimeUnit::SECONDS,
                                     LinkedBlockingQueue.new)
 
-  # setup logging
+  # setup global logging
   $log = Logger.new('cacheFire.log', 'daily')
   $log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
@@ -104,10 +104,9 @@ begin
   # crawl URL and generate scour.dat file if asked to
   if options.config[:scour]
     puts "Crawling #{url} looking for links..." unless quiet
-    
-      Crawl.new(url, threads)
-
-    puts "Done! Now you can run in Retrieve mode." unless quiet
+    Crawl.new(url, threads, options)
+    linkPool = LinkPool.new(options)
+    puts "The scour.dat file contains #{linkPool.count} entries." unless quiet
   end
 
 
@@ -117,7 +116,6 @@ begin
 
     raise 'File scour.dat cannot be found!' unless File.exists?('scour.dat')
 
-            # setup peristent connection to url
             h = PersistentHTTP.new(
                 :name         => 'cacheFire',
                 :pool_size    => 1024,
@@ -128,8 +126,8 @@ begin
                 :port         => port
             )
 
-    linkPool = LinkPool.new( options ) # class for pool mngmt / cache hits and misses
-    linkPool.read # read the scour.dat file to get links
+    linkPool = LinkPool.new(options) 
+    linkPool.read 
 
     if options.config[:targeted]
       ratio = options.config[:targeted].to_i
