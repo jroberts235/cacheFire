@@ -9,75 +9,14 @@ require 'options.rb'
 require 'linkpool.rb'     
 require 'job.rb'         
 require 'varnish.rb'
+require 'standard.rb'
+require 'targeted.rb'
 
 java_import 'java.util.concurrent.FutureTask'
 java_import 'java.util.concurrent.LinkedBlockingQueue'
 java_import 'java.util.concurrent.ThreadPoolExecutor'
 java_import 'java.util.concurrent.TimeUnit'
 
-
-def run_standard(executor, links, threads, h, url, linkPool, options)
-  progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
-                                   :starting_at => 0,
-                                   :total => links,
-                                   :smoothing => 0.8) unless options.config[:quiet]
-
-  tasks = [] # array to track threads
-
-  (links/threads).times do
-    if linkPool.pool.count >= 1
-      threads.times do
-        task = FutureTask.new(Job.new(h, url, linkPool, options))
-        executor.execute(task)
-        tasks << task
-        progressbar.increment unless options.config[:quiet]
-      end
-    end
-
-    # wait for all threads to complete
-    tasks.each do |t|
-      t.get
-    end
-   end
-
-   # finish with some stats
-   unless options.config[:quiet]
-     linkPool.calc_ratio
-     puts "\n"
-     puts "Cache-Hits:     #{linkPool.hits}"
-     puts "Cache-Miss:     #{linkPool.total - linkPool.hits}"
-     puts "Hit/Miss Ratio: #{linkPool.ratio}%"
-   end
-end
-
-def run_targeted(executor, ratio, threads, h, url, linkPool, options)
-  raise "Targeted mode requires that varnish be installed locally" unless File.exist?('/usr/bin/varnishstat')
-
-  progressbar = ProgressBar.create(:format => '%a %w',
-                                   :starting_at => 0,
-                                   :total => 100,
-                                   :smoothing => 0.8) unless options.config[:quiet]
-
-  tasks = [] # array to track threads
-
-  until varnishRatio >= ratio do
-    threads.times do
-      task = FutureTask.new(Job.new(h, url, linkPool, options))
-      executor.execute(task)
-      tasks << task
-    end
-    progressbar.progress= varnishRatio unless options.config[:quiet]
-
-    if linkPool.pool.count < threads
-      linkPool.reload
-    end
-
-    # wait for all threads to complete
-    tasks.each do |t|
-      t.get
-    end
-  end
-end
 
 begin
   options = Options.new
