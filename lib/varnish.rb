@@ -11,10 +11,10 @@ def varnishRatio
   stats['varnishstat']['stat'].each do |stat|
     cache_hit  = stat['value'] if stat['name'] == 'cache_hit'
     cache_miss = stat['value'] if stat['name'] == 'cache_miss'
-    cache_pass = stat['value'] if stat['name'] == 'cache_pass'
+    #cache_pass = stat['value'] if stat['name'] == 'cache_pass'
   end
 
-  total = cache_hit.to_i + cache_miss.to_i + cache_pass.to_i
+  total = cache_hit.to_i + cache_miss.to_i #+ cache_pass.to_i
   if total == 0
     ratio = 0
     return ratio

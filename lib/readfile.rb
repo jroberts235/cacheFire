@@ -9,7 +9,7 @@ class ReadFile
     $log.info("Reading scour.dat")
 
     File.open("scour.dat", "r").each_line do |line|
-      @lines[line] = 1
+      @lines[line.chomp] = 1
     end
 
     msg = "Read #{@lines.keys.count} lines from dat file\n"

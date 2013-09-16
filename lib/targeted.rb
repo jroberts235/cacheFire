@@ -12,7 +12,7 @@ def run_targeted(executor, ratio, threads, h, url, linkPool, options)
     threads.times do
       task = FutureTask.new(Job.new(h, url, linkPool, options))
       executor.execute(task)
-      linkPool.total_incr
+
       tasks << task
     end
     progressbar.progress= varnishRatio unless options.config[:quiet]

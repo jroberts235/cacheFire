@@ -15,9 +15,12 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
         executor.execute(task)
         tasks << task
 
-        linkPool.total_incr
         progressbar.increment unless options.config[:quiet]
       end
+    end
+
+    if linkPool.pool.count < threads
+      linkPool.reload
     end
 
     # wait for all threads to complete

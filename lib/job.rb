@@ -15,12 +15,14 @@ class Job
     uri = @linkPool.pool.keys.sample
     req = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
 
+    @linkPool.total_incr
+    @linkPool.remove(uri) if @options.config[:prune]
+
     if req.get_fields('X-Cache').include?("HIT")
-      $log.info("Hit: #{uri.chomp}")
+      $log.info("Hit: #{uri}")
       @linkPool.hits_incr
-      @linkPool.remove(uri) if @options.config[:prune]
     else
-      $log.info("Miss: #{uri.chomp}")
+      $log.info("Miss: #{uri}")
     end
   end
 end
