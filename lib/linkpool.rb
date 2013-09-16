@@ -9,15 +9,14 @@ class Net::HTTP::Purge < Net::HTTPRequest
   RESPONSE_HAS_BODY = true
 end
 
+module RestClient
+  def self.purge(url, headers={}, &block)
+    Request.execute(:method => :purge, :url => url, :port => 6081, :headers => headers, &block)
+  end
+end
+
 class LinkPool
   attr_accessor( :count, :total, :hits, :ratio, :pool )
-
-  module RestClient
-    def self.purge(url, headers={}, &block)
-      Request.execute(:method => :purge, :url => url, :port => 6081, :headers => headers, &block)
-    end
-  end
-
   def initialize(options)
     @total   = 0
     @hits    = 0
@@ -57,7 +56,7 @@ class LinkPool
   def purge 
     self.read
     @pool.keys.each do |uri|
-      RestClient.purge "#{@options.config[':url']}/#{uri}"
+      RestClient.purge "#{@options.config[:url]}/#{uri}"
     end
   end
 end
