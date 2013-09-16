@@ -37,6 +37,6 @@ jruby ./cacheFire.rb -u http://YOUR.SITE -r -p -T 85    Get every link until cac
 
 Caveats:
 
-"Random":  I am not sure how Rnd this really is.  I am using the array.sample method to pull links from the link pool and it works just fine for my purposes.  I you need something different please submit a pull request.
+"Random":  I am not sure how Rnd this really is.  I am using the Hash.sample method to pull links from the link pool and it works just fine for my purposes.  I you need something different please submit a pull request.
 
-"Multi-Threaded Issues":  This is my first mutli-threaded application and I learned a lot by writing it.  I, no doubt, have made some newbie mistakes and missed optimizations that could make it better.  I welcome your comments and pull requests.  One problem that I KNOW exists is the the purge option.  Because the individual thread jobs themselves remove links from the shared Array,  errors will ocassionally be thrown, despite the inclusion of the thread-safe libray.
+"Multi-Threaded Issues":  This is my first mutli-threaded application and I learned a lot by writing it.  I, no doubt, have made some newbie mistakes and missed optimizations that could make it better.  I welcome your comments and pull requests.  One problem that I KNOW exists is the the purge option.  Because the individual thread jobs themselves remove links from the shared Hash,  errors will ocassionally be thrown, despite the inclusion of the thread-safe libray.
