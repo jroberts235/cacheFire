@@ -16,7 +16,7 @@ def run_targeted(executor, ratio, threads, h, url, linkPool, options)
 
       tasks << task
     end
-    progressbar.progress= varnishRatio unless options.config[:quiet]
+    progressbar.progress= linkPool.ratio unless options.config[:quiet]
 
     if linkPool.pool.count < threads
       linkPool.reload
