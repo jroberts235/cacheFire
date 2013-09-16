@@ -42,10 +42,15 @@ class Options
     :default => 100
 
   option :prune,
-    :short => "-p",
     :long => "--prune",
     :boolean => true,
     :description => "Get every link only once",
+    :default => false
+
+  option :purge,
+    :long => "--purge",
+    :description => "Purge the URI's in the scour.dat file",
+    :boolean => true,
     :default => false
  
   option :port,

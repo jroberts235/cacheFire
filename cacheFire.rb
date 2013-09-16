@@ -39,6 +39,14 @@ begin
   $log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
 
+  # Purge all links from the cache
+  if options.config[:purge]
+    puts 'Purging all links from cache'
+    linkPool = LinkPool.new(options) 
+    linkPool.purge 
+  end
+
+
   # Scour Mode
   # crawl URL and generate scour.dat file if asked to
   if options.config[:scour]
