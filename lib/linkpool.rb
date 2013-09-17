@@ -15,6 +15,7 @@ module RestClient
   end
 end
 
+
 class LinkPool
   attr_accessor( :count, :total, :hits, :ratio, :pool )
   def initialize(options)
