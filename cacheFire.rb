@@ -29,10 +29,12 @@ begin
 
   # create the thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
-                                    256,     # max_pool_threads
+                                    threads,     # max_pool_threads
                                     5,       # keep_alive_time
                                     TimeUnit::SECONDS,
                                     LinkedBlockingQueue.new)
+                                    
+
 
   # setup global logging
   $log = Logger.new('cacheFire.log', 'daily')
@@ -65,8 +67,8 @@ begin
 
             h = PersistentHTTP.new(
                 :name         => 'cacheFire',
-                :pool_size    => 1024,
-                :pool_timeout => 2,
+                :pool_size    => 2048,
+                :pool_timeout => 10,
                 :warn_timeout => 0.25,
                 :force_retry  => true,
                 :url          => url,
