@@ -1,4 +1,4 @@
-~ cacheFire ~
+## cacheFire 
 
 A cache heater/load gen tool written in jruby and that is multithreaded for better performance.
 There are three modes to run the app in, "Scour", "Retrieve" and "Targetd Retrieve".  
@@ -16,26 +16,26 @@ Targeted Retreive:  This mode Gets every link until the cache reaches the Hit/Mi
 Running with "purge" option: This option causes every link to be pulled until it's a cache hit, then it's removed from the link pool.  This is valuable if you goal is to heat the entire cache evenly rather than just create load.  If using this option while doing a Targeted Retreive you will likely deplete the link pool before your target goal is complete.  To keep this from happening it will reload the scour.dat file when the link pool has exactly #{threads} entries left.  In a standard Retrieve run,  when the link pool is depleted all currenlty running job will end and the app will exit gracefully.
 
 
-REQUIRES:  
+## REQUIRES:  
 
 jruby, java and the bundler gem.
 
 
-INSTALL: 
+## INSTALL: 
 
-rvm install jruby
-git clone git@github.com:jroberts235/cacheFire.git
-cd cacheFire ; bundler 
+    $ rvm install jruby
+    $ git clone git@github.com:jroberts235/cacheFire.git
+    $ cd cacheFire ; bundler 
 
 
-USAGE:
+## USAGE:
 
 jruby ./cacheFire.rb -u http://YOUR.SITE -s             Scour the site and find all links
 jruby ./cacheFire.rb -u http://YOUR.SITE -r -l 10000    Retrieve links randomly 10000 times
 jruby ./cacheFire.rb -u http://YOUR.SITE -r -p -T 85    Get every link until cache is 85% hot
 
 
-Caveats:
+## Caveats:
 
 "Random":  I am not sure how Rnd this really is.  I am using the Hash.sample method to pull links from the link pool and it works just fine for my purposes.  I you need something different please submit a pull request.
 
