@@ -39,6 +39,7 @@ begin
   # setup global logging
   $log = Logger.new('cacheFire.log', 'daily')
   $log.datetime_format = "%Y-%m-%d %H:%M:%S"
+  $log.info("\ncacheFire\n#{`date`}")
 
 
   # Purge all links from the cache
@@ -86,7 +87,9 @@ begin
       puts "Getting #{links} links using #{threads} thread(s)." unless options.config[:quiet]
       run_standard(executor, links, threads, h, url, linkPool, options)
     end
-
+    require 'json'
+    $stdout = File.open('404s.json', 'w')
+    puts linkPool.errors.to_json
   end
 ensure 
   executor.shutdown() if options.config[:retrieve]

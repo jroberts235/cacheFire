@@ -17,12 +17,13 @@ end
 
 
 class LinkPool
-  attr_accessor( :count, :total, :hits, :ratio, :pool )
+  attr_accessor( :count, :total, :hits, :ratio, :pool, :errors )
   def initialize(options)
     @total   = 0
     @hits    = 0
     @ratio   = 0
     @count   = 0
+    @errors  = ThreadSafe::Array.new
     @pool    = ThreadSafe::Hash.new
     @options = options
   end
@@ -53,6 +54,9 @@ class LinkPool
     $log.info("removing #{uri}")
     @pool.delete(uri) 
     $log.info("Pool Size: #{@pool.keys.count}")
+  end
+  def error(uri)
+    @errors << uri
   end
   def purge 
     self.read
