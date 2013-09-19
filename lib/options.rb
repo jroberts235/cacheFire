@@ -41,8 +41,8 @@ class Options
     :description => "Number of links to retrieve",
     :default => 100
 
-  option :prune,
-    :long => "--prune",
+  option :uniq,
+    :long => "--uniq",
     :boolean => true,
     :description => "Get every link only once",
     :default => false

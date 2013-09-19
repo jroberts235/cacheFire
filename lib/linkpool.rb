@@ -51,9 +51,9 @@ class LinkPool
     @ratio = ((self.hits.to_f / self.total.to_f) * 100).to_i if @total > 0
   end
   def remove(uri)
-    $log.info("removing #{uri}")
+    $log.info("Pruning #{uri} from link pool")
     @pool.delete(uri) 
-    $log.info("Pool Size: #{@pool.keys.count}")
+    $log.info("Links remaining: #{@pool.keys.count}")
   end
   def error(uri)
     @errors << uri

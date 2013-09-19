@@ -15,7 +15,7 @@ class Job
     uri = @linkPool.pool.keys.sample
     req = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
 
-    @linkPool.remove(uri) if @options.config[:prune]
+    @linkPool.remove(uri) if @options.config[:uniq]
 
     if req.get_fields('Status')
       if req.get_fields('Status').include?("404 Not Found") 
@@ -27,11 +27,13 @@ class Job
 
     @linkPool.total_incr
 
-    if req.get_fields('X-Cache').include?("HIT")
-      $log.info("Hit: #{uri}")
-      @linkPool.hits_incr
-    else
-      $log.info("Miss: #{uri}")
+    if req.get_fields('X-Cache')
+      if req.get_fields('X-Cache').include?("HIT")
+        $log.info("Hit: #{uri}")
+        @linkPool.hits_incr
+      else
+        $log.info("Miss: #{uri}")
+      end
     end
 
   end
