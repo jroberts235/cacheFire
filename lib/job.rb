@@ -12,13 +12,22 @@ class Job
     @options  = options
   end
   def call
+
     uri = @linkPool.pool.keys.sample
-    req = @h.request(Net::HTTP::Get.new("#{@url}/#{uri}"))
+
+    beginning_time = Time.now
+      req = Net::HTTP::Get.new("#{uri}")
+      req['Accept-Encoding'] = 'gzip,deflate'
+      req['User-Agent'] = 'cacheFire'
+      res = @h.request(req)
+    end_time = Time.now
+
+    timer = (end_time - beginning_time)*1000
 
     @linkPool.remove(uri) if @options.config[:uniq]
 
-    if req.get_fields('Status')
-      if req.get_fields('Status').include?("404 Not Found") 
+    if res.get_fields('Status')
+      if res.get_fields('Status').include?("404 Not Found") 
         @linkPool.error(uri)
         $log.error("404: #{uri}")
         return
@@ -27,12 +36,12 @@ class Job
 
     @linkPool.total_incr
 
-    if req.get_fields('X-Cache')
-      if req.get_fields('X-Cache').include?("HIT")
-        $log.info("Hit: #{uri}")
+    if res.get_fields('X-Cache')
+      if res.get_fields('X-Cache').include?("HIT")
+        $log.info("HIT(#{timer/1000}): #{uri}")
         @linkPool.hits_incr
       else
-        $log.info("Miss: #{uri}")
+        $log.info("MISS(#{timer/1000}): #{uri}")
       end
     end
 

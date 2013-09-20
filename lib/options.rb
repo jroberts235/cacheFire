@@ -41,6 +41,12 @@ class Options
     :description => "Number of links to retrieve",
     :default => 100
 
+  option :file,
+    :short => "-f name",
+    :long => "--file name",
+    :description => "File name to find links in",
+    :default => 'scour.dat'
+
   option :uniq,
     :long => "--uniq",
     :boolean => true,

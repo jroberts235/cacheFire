@@ -11,7 +11,7 @@ end
 
 module RestClient
   def self.purge(url, headers={}, &block)
-    Request.execute(:method => :purge, :url => url, :port => 6081, :headers => headers, &block)
+    Request.execute(:method => :purge, :url => url, :headers => headers, &block)
   end
 end
 
@@ -26,6 +26,7 @@ class LinkPool
     @errors  = ThreadSafe::Array.new
     @pool    = ThreadSafe::Hash.new
     @options = options
+    @url     = options.config[:url]
   end
   def read
     # Call readfile and populate the links Hash
@@ -61,7 +62,8 @@ class LinkPool
   def purge 
     self.read
     @pool.keys.each do |uri|
-      RestClient.purge "#{@options.config[:url]}/#{uri}"
+      $log.info("Purging #{@url + uri}")
+      RestClient.purge "#{@url}:6081#{uri}"
     end
   end
 end

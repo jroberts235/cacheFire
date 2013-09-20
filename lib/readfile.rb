@@ -5,16 +5,16 @@ class ReadFile
     @options = options
   end
   def open
+    filename = @options.config[:file]
 
     $log.info("Reading scour.dat")
 
-    File.open("scour.dat", "r").each_line do |line|
+    File.open(filename, "r").each_line do |line|
       @lines[line.chomp] = 1
     end
 
-    msg = "Read #{@lines.keys.count} lines from dat file\n"
+    msg = "Read #{@lines.keys.count} lines from #{filename}\n"
 
-    #puts msg unless @options.config[:quiet]
     $log.info(msg)
   end
 end

@@ -27,22 +27,18 @@ begin
              threads = options.config[:threads].to_i
                links = options.config[:links].to_i
 
-  # setup global logging
-  $log = Logger.new('cacheFire.log', 'daily')
-  $log.datetime_format = "%Y-%m-%d %H:%M:%S"
-  $log.info("\n\ncacheFire\n#{`date`}\n")
-
-  # log the cmd options
-  options.config.each do |k,v|
-    $log.debug("#{k} = #{v}") if v 
-  end 
-
   # create the thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
                                     threads,     # max_pool_threads
                                     5,       # keep_alive_time
                                     TimeUnit::SECONDS,
                                     LinkedBlockingQueue.new)
+                                    
+
+
+  # setup global logging
+  $log = Logger.new('cacheFire.log', 'daily')
+  $log.datetime_format = "%Y-%m-%d %H:%M:%S"
 
 
   # Purge all links from the cache
@@ -90,9 +86,7 @@ begin
       puts "Getting #{links} links using #{threads} thread(s)." unless options.config[:quiet]
       run_standard(executor, links, threads, h, url, linkPool, options)
     end
-    require 'json'
-    $stdout = File.open('404s.json', 'w')
-    puts linkPool.errors.to_json
+
   end
 ensure 
   executor.shutdown() if options.config[:retrieve]
