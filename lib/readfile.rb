@@ -7,14 +7,14 @@ class ReadFile
   def open
     filename = @options.config[:file]
 
-    $log.info("Reading scour.dat")
+    raise "File #{filename} cannot be found!" unless File.exists?(filename)
+
+    $log.info("Reading #{filename}")
 
     File.open(filename, "r").each_line do |line|
       @lines[line.chomp] = 1
     end
 
-    msg = "Read #{@lines.keys.count} lines from #{filename}\n"
-
-    $log.info(msg)
+    $log("Read #{@lines.keys.count} lines from #{filename}\n")
   end
 end

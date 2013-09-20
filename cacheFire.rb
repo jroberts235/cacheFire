@@ -63,8 +63,6 @@ begin
   # use the scour.dat file to GET random links from URL 
   if options.config[:retrieve]
 
-    raise 'File scour.dat cannot be found!' unless File.exists?('scour.dat')
-
             h = PersistentHTTP.new(
                 :name         => 'cacheFire',
                 :pool_size    => 2048,
