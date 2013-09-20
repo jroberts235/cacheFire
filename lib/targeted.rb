@@ -1,5 +1,4 @@
-def run_targeted(executor, ratio, threads, h, url, linkPool, options)
-  #raise "Targeted mode requires that varnish be installed locally" unless File.exist?('/usr/bin/varnishstat')
+def run_targeted(executor, ratio, threads, h, url, linkPool, options, stats)
 
   progressbar = ProgressBar.create(:format => '%a %w',
                                    :starting_at => 0,
@@ -7,22 +6,22 @@ def run_targeted(executor, ratio, threads, h, url, linkPool, options)
                                    :smoothing => 0.8) unless options.config[:quiet]
 
   tasks = [] # array to track threads
-  linkPool.calc_ratio
+  stats.calc_ratio
 
-  until linkPool.ratio >= ratio do
+  until stats.ratio >= ratio do
     threads.times do
-      task = FutureTask.new(Job.new(h, url, linkPool, options))
+      task = FutureTask.new(Job.new(h, url, linkPool, options, stats))
       executor.execute(task)
 
       tasks << task
     end
-    progressbar.progress= linkPool.ratio unless options.config[:quiet]
+    progressbar.progress= stats.ratio unless options.config[:quiet]
 
     if linkPool.pool.count < threads
       linkPool.reload
     end
 
-    linkPool.calc_ratio
+    stats.calc_ratio
  
     # wait for all threads to complete
     tasks.each do |t|

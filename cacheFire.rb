@@ -4,13 +4,14 @@ $LOAD_PATH << './lib'
 require 'ruby-progressbar'
 require 'logger'
 require 'java'
-require 'crawl.rb'
+require 'scour.rb'
 require 'options.rb'
 require 'linkpool.rb'     
 require 'job.rb'         
 require 'varnish.rb'
 require 'standard.rb'
 require 'targeted.rb'
+require 'stats.rb'
 
 java_import 'java.util.concurrent.FutureTask'
 java_import 'java.util.concurrent.LinkedBlockingQueue'
@@ -52,10 +53,8 @@ begin
   # Scour Mode
   # crawl URL and generate scour.dat file if asked to
   if options.config[:scour]
-    puts "Crawling #{url} looking for links..." unless options.config[:quiet]
-    Crawl.new(url, threads, options)
-    linkPool = LinkPool.new(options)
-    puts "The scour.dat file contains #{linkPool.count} entries." unless options.config[:quiet]
+    puts "Scouring #{url} looking for links..." unless options.config[:quiet]
+    Scour.new(url, threads, options)
   end
 
 
@@ -76,13 +75,15 @@ begin
     linkPool = LinkPool.new(options) 
     linkPool.read 
 
+    stats    = Stats.new(options, linkPool)
+
     if options.config[:targeted]
       ratio = options.config[:targeted].to_i
       puts "Heating cache to #{ratio}% using #{threads} thread(s)." unless options.config[:quiet]
-      run_targeted(executor, ratio, threads, h, url, linkPool, options)
+      run_targeted(executor, ratio, threads, h, url, linkPool, options, stats)
     else
       puts "Getting #{links} links using #{threads} thread(s)." unless options.config[:quiet]
-      run_standard(executor, links, threads, h, url, linkPool, options)
+      run_standard(executor, links, threads, h, url, linkPool, options, stats)
     end
 
   end

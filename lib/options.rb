@@ -55,7 +55,7 @@ class Options
 
   option :purge,
     :long => "--purge",
-    :description => "Purge the URI's in the scour.dat file",
+    :description => "Purge the path's in the scour.dat file",
     :boolean => true,
     :default => false
  

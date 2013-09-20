@@ -1,4 +1,4 @@
-def run_standard(executor, links, threads, h, url, linkPool, options)
+def run_standard(executor, links, threads, h, url, linkPool, options, stats)
   progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
                                    :starting_at => 0,
                                    :total => links,
@@ -7,11 +7,11 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
 
   tasks = [] # array to track threads
 
-  (links/threads).times do
+  (links / threads).times do
     if linkPool.pool.count >= 1
       threads.times do
 
-        task = FutureTask.new(Job.new(h, url, linkPool, options))
+        task = FutureTask.new(Job.new(h, url, linkPool, options, stats))
         executor.execute(task)
         tasks << task
 
@@ -31,13 +31,13 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
 
    # finish with some stats
    unless options.config[:quiet]
-     linkPool.calc_ratio
+     stats.calc_ratio
      puts "\n"
-     puts "Cache-Hits:     #{linkPool.hits}"
-     puts "Cache-Miss:     #{linkPool.total - linkPool.hits}"
-     puts "Hit/Miss Ratio: #{linkPool.ratio}%"
-     puts "Errors:         #{linkPool.errors.count}"
-     puts "Hit Avg:        #{(linkPool.hit_avg).round(3)}s"
-     puts "Miss Avg:       #{(linkPool.miss_avg.round(3))}s"
+     puts "Cache-Hits:     #{stats.hits}"
+     puts "Cache-Miss:     #{stats.total - stats.hits}"
+     puts "Hit/Miss Ratio: #{stats.ratio}%"
+     puts "Errors:         #{stats.errors.count}"
+     puts "Hit Avg:        #{(stats.hit_avg).round(3)}s"
+     puts "Miss Avg:       #{(stats.miss_avg.round(3))}s"
    end
 end
