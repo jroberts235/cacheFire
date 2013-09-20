@@ -18,7 +18,8 @@ def run_standard(executor, links, threads, h, url, linkPool, options, stats)
         progressbar.increment unless options.config[:quiet]
       end
     end
-
+    
+    # don't run out of path to pass to jobs
     if linkPool.pool.count < threads
       linkPool.reload
     end

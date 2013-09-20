@@ -2,6 +2,7 @@ require 'thread_safe'
 
 class Stats
   attr_accessor( :total, :hits, :ratio, :errors)
+
   def initialize(options, linkPool)
     @total      = 0
     @hits       = 0
