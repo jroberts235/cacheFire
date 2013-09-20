@@ -29,8 +29,8 @@ begin
 
   # create the thread pool
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
-                                    threads,     # max_pool_threads
-                                    5,       # keep_alive_time
+                                    (threads * 3),     # max_pool_threads
+                                    300,       # keep_alive_time
                                     TimeUnit::SECONDS,
                                     LinkedBlockingQueue.new)
                                     

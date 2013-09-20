@@ -17,16 +17,18 @@ end
 
 
 class LinkPool
-  attr_accessor( :count, :total, :hits, :ratio, :pool, :errors )
+  attr_accessor( :count, :total, :hits, :ratio, :pool, :errors)
   def initialize(options)
     @total   = 0
     @hits    = 0
     @ratio   = 0
     @count   = 0
-    @errors  = ThreadSafe::Array.new
-    @pool    = ThreadSafe::Hash.new
     @options = options
     @url     = options.config[:url]
+    @errors  = ThreadSafe::Array.new
+    @pool    = ThreadSafe::Hash.new
+    @miss_rates = ThreadSafe::Array.new
+    @hit_rates  = ThreadSafe::Array.new
   end
   def read
     # Call readfile and populate the links Hash
@@ -58,6 +60,18 @@ class LinkPool
   end
   def error(uri)
     @errors << uri
+  end
+  def miss(time)
+    @miss_rates << time 
+  end
+  def hit(time)
+    @hit_rates << time 
+  end
+  def miss_avg
+    @miss_rates.inject{ |sum, el| sum + el }.to_f / @miss_rates.size
+  end
+  def hit_avg
+    @hit_rates.inject{ |sum, el| sum + el }.to_f / @hit_rates.size
   end
   def purge 
     self.read

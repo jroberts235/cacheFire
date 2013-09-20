@@ -13,7 +13,7 @@ class Job
   end
   def call
 
-    uri = @linkPool.pool.keys.sample
+  uri = @linkPool.pool.keys.sample
 
     beginning_time = Time.now
       req = Net::HTTP::Get.new("#{uri}")
@@ -39,9 +39,11 @@ class Job
     if res.get_fields('X-Cache')
       if res.get_fields('X-Cache').include?("HIT")
         $log.info("HIT(#{timer/1000}): #{uri}")
+        @linkPool.hit(timer/1000)
         @linkPool.hits_incr
       else
         $log.info("MISS(#{timer/1000}): #{uri}")
+        @linkPool.miss(timer/1000)
       end
     end
 

@@ -37,5 +37,7 @@ def run_standard(executor, links, threads, h, url, linkPool, options)
      puts "Cache-Miss:     #{linkPool.total - linkPool.hits}"
      puts "Hit/Miss Ratio: #{linkPool.ratio}%"
      puts "Errors:         #{linkPool.errors.count}"
+     puts "Hit Avg:        #{(linkPool.hit_avg).round(3)}s"
+     puts "Miss Avg:       #{(linkPool.miss_avg.round(3))}s"
    end
 end
