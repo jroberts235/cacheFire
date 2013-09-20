@@ -15,6 +15,6 @@ class ReadFile
       @lines[line.chomp] = 1
     end
 
-    $log("Read #{@lines.keys.count} lines from #{filename}\n")
+    $log.info("Read #{@lines.keys.count} lines from #{filename}\n")
   end
 end
