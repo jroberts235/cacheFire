@@ -53,7 +53,6 @@ begin
   # Scour Mode
   # crawl URL and generate scour.dat file if asked to
   if options.config[:scour]
-    puts "Scouring #{url} looking for links..." unless options.config[:quiet]
     Scour.new(url, threads, options)
   end
 

@@ -2,23 +2,28 @@ require 'anemone'
 
 class Scour
   def initialize(url, threads, options)
-    links    = []
-    filename = options.config[:filename]
+    links = []
+    file  = options.config[:file]
 
-    dataFile = File.new filename, "w"
+    puts "Scouring #{url} using #{threads} threads and writing to #{file}" unless options.config[:quiet]
+
+    # get rid of old scour data
+    dataFile = File.new file, "w"
     dataFile.close
 
     progressbar = ProgressBar.create(:starting_at => 20,
                                      :total => nil) unless options.config[:quiet]
     beginning_time = Time.now
     $log.info("Crawl started at #{beginning_time}")
-    Anemone.crawl(url) do |anemone|
-      anemone.threads = threads
+
+    Anemone.crawl(url, :discard_page_bodies => true, :threads => threads) do |anemone|
+      #anemone.threads = threads
       anemone.on_every_page do |page|
         (page.links).each do |link|
-          unless links.include?(link) and link != nil
+          next if link.to_s.include?('filter') or link == nil
+          unless links.include?(link) 
             links << link
-            File.open(filename, 'a') do |file|
+            File.open(file, 'a') do |file|
               file << "#{(link.to_s.split('/', 4))[3]}\n"
               $log.info("Discovered: #{(link.to_s.split('/', 4))[3]}")
             end
