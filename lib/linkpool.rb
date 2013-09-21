@@ -29,7 +29,7 @@ class LinkPool
   def read
     # Call readfile and populate the links Hash
     r = ReadFile.new( @options )
-    r.open # open the file for reading
+    r.open 
     @pool = r.lines
   end
 

@@ -51,14 +51,14 @@ begin
 
 
   # Scour Mode
-  # crawl URL and generate scour.dat file if asked to
+  # crawl URL and generate $file.dat
   if options.config[:scour]
     Scour.new(url, threads, options)
   end
 
 
   # Retrieve Mode
-  # use the scour.dat file to GET random links from URL 
+  # use the $filename.dat file to GET random links from URL 
   if options.config[:retrieve]
 
             h = PersistentHTTP.new(
@@ -74,14 +74,14 @@ begin
     linkPool = LinkPool.new(options) 
     linkPool.read 
 
-    stats    = Stats.new(options, linkPool)
+    stats = Stats.new(options, linkPool)
 
     if options.config[:targeted]
       ratio = options.config[:targeted].to_i
-      puts "Heating cache to #{ratio}% using #{threads} thread(s)." unless options.config[:quiet]
+      puts "Heating cache to #{ratio}% using #{threads} thread(s)."  unless options.config[:quiet]
       run_targeted(executor, ratio, threads, h, url, linkPool, options, stats)
     else
-      puts "Getting #{links} links using #{threads} thread(s)." unless options.config[:quiet]
+      puts "Getting #{links} links using #{threads} thread(s)."  unless options.config[:quiet]
       run_standard(executor, links, threads, h, url, linkPool, options, stats)
     end
 

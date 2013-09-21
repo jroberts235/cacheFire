@@ -16,7 +16,7 @@ class Job
   def call
     # pull a rnd link from the hash
     path = @linkPool.pool.keys.sample.dup
-    path.gsub!(/^/, '/') unless path.start_with?('/')
+    path.gsub!(/^/, '/')  unless path.start_with?('/')
 
     beginning_time = Time.now
       req = Net::HTTP::Get.new(path)
@@ -27,7 +27,7 @@ class Job
 
     timer = (end_time - beginning_time)*1000
 
-    @linkPool.remove(path) if @options.config[:uniq]
+    @linkPool.remove(path)  if @options.config[:uniq]
 
     # check for and log any missing paths
     if res.get_fields('Status')
