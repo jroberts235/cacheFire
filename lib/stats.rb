@@ -4,13 +4,13 @@ class Stats
   attr_accessor( :total, :hits, :ratio, :errors)
 
   def initialize(options, linkPool)
-    @total      = 0
-    @hits       = 0
-    @ratio      = 0
-    @options    = options
-    @errors     = ThreadSafe::Array.new
-    @miss_rates = ThreadSafe::Array.new
-    @hit_rates  = ThreadSafe::Array.new
+       @total = 0
+        @hits = 0
+       @ratio = 0
+     @options = options
+      @errors = ThreadSafe::Array.new
+  @miss_rates = ThreadSafe::Array.new
+   @hit_rates = ThreadSafe::Array.new
   end
   def total_incr
     @total += 1

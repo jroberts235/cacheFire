@@ -9,7 +9,7 @@ class Scour
     unless options.config[:redis]
       file  = options.config[:file]
     else
-      file = 'redis'
+       file = 'redis'
       redis = Redis.new
     end
 

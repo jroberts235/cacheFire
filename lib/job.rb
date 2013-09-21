@@ -7,12 +7,12 @@ java_import 'java.util.concurrent.Callable'
 class Job
   include Callable
   def initialize(conn_handle, url, linkPool, options, stats, path)
-    @h        = conn_handle
-    @url      = url
-    @linkPool = linkPool
-    @options  = options
-    @stats    = stats
-    @path     = path
+         @h = conn_handle
+       @url = url
+  @linkPool = linkPool
+   @options = options
+     @stats = stats
+      @path = path
 
     raise "No connection handle provide to the job!" if @h == nil
     raise "No path provided to job!"    if @path == nil

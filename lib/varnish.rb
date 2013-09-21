@@ -1,7 +1,7 @@
 require 'crack'
 
 def varnishRatio
-  cache_hit  = 0
+   cache_hit = 0
   cache_miss = 0
   cache_pass = 0
 

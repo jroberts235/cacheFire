@@ -20,10 +20,10 @@ end
 class LinkPool
   attr_accessor(:count, :pool)
   def initialize(options)
-    @count   = 0
-    @options = options
-    @url     = options.config[:url]
-    @pool    = ThreadSafe::Hash.new
+    @count = 0
+  @options = options
+      @url = options.config[:url]
+     @pool = ThreadSafe::Hash.new
   end
 
   def fetch

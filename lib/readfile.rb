@@ -2,7 +2,7 @@ class ReadFile
   attr_accessor :lines
 
   def initialize(options)
-    @lines = Hash.new
+      @lines = Hash.new
     @options = options
 
     raise "You can't specify both --redis and -f, --filename!" if @options.config[:redis]
