@@ -16,20 +16,21 @@ class Options
     :default => 1
 
   option :scour,
-    :short => "-s",
+    :short => "-S",
     :long => "--scour",
     :boolean => true,
     :description => "scour URL and build data file?",
     :default => false
 
   option :targeted,
-    :short => "-T number",
-    :long => "--targeted number",
-    :description => "Pull links until the Hit/Miss ratio reaches the specified amnt",
+    :short => "-T",
+    :long => "--targeted",
+    :boolean => true,
+    :description => "Pull every link once, thereby heating the cache 100%",
     :default => nil
 
   option :retrieve,
-    :short => "-r",
+    :short => "-R",
     :long => "--retrieve",
     :boolean => true,
     :description => "Read the data from scour.dat and pick random URLs to hit",
@@ -66,7 +67,7 @@ class Options
     :default => false
  
   option :port,
-    :short => "-P number",
+    :short => "-p number",
     :long => "--Port number",
     :description => "Port to connect to",
     :default => 80

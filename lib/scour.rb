@@ -2,10 +2,16 @@ require 'anemone'
 require 'redis'
 
 class Scour
-  def initialize(url, threads, options)
-    #file  = options.config[:file]
-    file = 'redis'
-    redis = Redis.new
+  def initialize(options)
+        url = options.config[:url]
+    threads = options.config[:threads]
+
+    unless options.config[:redis]
+      file  = options.config[:file]
+    else
+      file = 'redis'
+      redis = Redis.new
+    end
 
     puts "Scouring #{url} using #{threads} threads and writing to #{file}"  unless options.config[:quiet]
 

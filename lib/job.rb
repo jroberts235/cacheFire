@@ -6,20 +6,22 @@ java_import 'java.util.concurrent.Callable'
 
 class Job
   include Callable
-  def initialize(conn_handle, url, linkPool, options, stats)
+  def initialize(conn_handle, url, linkPool, options, stats, path)
     @h        = conn_handle
     @url      = url
     @linkPool = linkPool
     @options  = options
     @stats    = stats
-  end
-  def call
-    # pull a rnd link from the hash
-    path = @linkPool.pool.keys.sample.dup
-    path.gsub!(/^/, '/')  unless path.start_with?('/')
+    @path     = path
 
+    raise "No connection handle provide to the job!" if @h == nil
+    raise "No path provided to job!"    if @path == nil
+    raise "No url provided to the job!" if @url == nil
+  end
+
+  def call
     beginning_time = Time.now
-      req = Net::HTTP::Get.new(path)
+      req = Net::HTTP::Get.new(@path)
       req['Accept-Encoding'] = 'gzip,deflate' # this is important
       req['User-Agent'] = 'cacheFire'
       res = @h.request(req)
@@ -27,13 +29,13 @@ class Job
 
     timer = (end_time - beginning_time)*1000
 
-    @linkPool.remove(path)  if (@options.config[:uniq] or @options.config[:target])
+    #@linkPool.remove(@path) if (@options.config[:uniq] or @options.config[:target])
 
     # check for and log any missing paths
     if res.get_fields('Status')
       if res.get_fields('Status').include?("404 Not Found") 
-        @stats.error(path)
-        $log.error("404: #{path}")
+        @stats.error(@path)
+        $log.error("404: #{@path}")
         return
       end
     end
@@ -45,11 +47,11 @@ class Job
     # track hits for ratio calc
     if res.get_fields('X-Cache')
       if res.get_fields('X-Cache').include?("HIT")
-        $log.info("HIT(#{timer/1000}): #{path}")
+        $log.info("HIT(#{timer/1000}): #{@path}")
         @stats.hit(timer/1000)
         @stats.hits_incr
       else
-        $log.info("MISS(#{timer/1000}): #{path}")
+        $log.info("MISS(#{timer/1000}): #{@path}")
         @stats.miss(timer/1000)
       end
     end

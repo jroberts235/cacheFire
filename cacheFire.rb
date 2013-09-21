@@ -28,13 +28,13 @@ begin
              threads = options.config[:threads].to_i
                links = options.config[:links].to_i
 
-  # create the thread pool
+
+  # create the thread pool for the executor
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
-                                    (threads * 3),     # max_pool_threads
-                                    300,       # keep_alive_time
-                                    TimeUnit::SECONDS,
-                                    LinkedBlockingQueue.new)
-                                    
+                                   (threads * 3),     # max_pool_threads
+                                   300,       # keep_alive_time
+                                   TimeUnit::SECONDS,
+                                   LinkedBlockingQueue.new )
 
 
   # setup global logging
@@ -53,23 +53,23 @@ begin
   # Scour Mode
   # crawl URL and generate $file.dat
   if options.config[:scour]
-    Scour.new(url, threads, options)
+    Scour.new(options)
   end
 
 
   # Retrieve Mode
-  # use the $filename.dat file to GET random links from URL 
+  # use the $filename.dat file or Redis to GET links from URL 
   if options.config[:retrieve]
 
-            h = PersistentHTTP.new(
-                :name         => 'cacheFire',
-                :pool_size    => 2048,
-                :pool_timeout => 10,
-                :warn_timeout => 0.25,
-                :force_retry  => true,
-                :url          => url,
-                :port         => port
-            )
+  # setup the connection to the host
+  h = PersistentHTTP.new(
+     :name         => 'cacheFire',
+     :pool_size    => 2048,
+     :pool_timeout => 10,
+     :warn_timeout => 0.25,
+     :force_retry  => true,
+     :url          => url,
+     :port         => port )
 
     linkPool = LinkPool.new(options) 
     linkPool.read 
@@ -77,11 +77,8 @@ begin
     stats = Stats.new(options, linkPool)
 
     if options.config[:targeted]
-      ratio = options.config[:targeted].to_i
-      puts "Heating cache to #{ratio}% using #{threads} thread(s)."  unless options.config[:quiet]
-      run_targeted(executor, ratio, threads, h, url, linkPool, options, stats)
+      run_targeted(executor, threads, h, url, linkPool, options, stats)
     else
-      puts "Getting #{links} links using #{threads} thread(s)."  unless options.config[:quiet]
       run_standard(executor, links, threads, h, url, linkPool, options, stats)
     end
 

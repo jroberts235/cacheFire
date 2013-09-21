@@ -1,4 +1,6 @@
 def run_standard(executor, links, threads, h, url, linkPool, options, stats)
+  puts "Getting #{links} links using #{threads} thread(s)."  unless options.config[:quiet]
+
   progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
                                    :starting_at => 0,
                                    :total => links,
@@ -8,19 +10,22 @@ def run_standard(executor, links, threads, h, url, linkPool, options, stats)
   tasks = [] # array to track threads
 
   (links / threads).times do
-    if linkPool.pool.count >= 1
+    if linkPool.pool.count >= 1 # stop if we run out of links
       threads.times do
+        path = linkPool.fetch
+        raise "No path returned from linkPool.fetch!" if path == nil
 
-        task = FutureTask.new(Job.new(h, url, linkPool, options, stats))
+        task = FutureTask.new(Job.new(h, url, linkPool, options, stats, path))
         executor.execute(task)
         tasks << task
 
+        linkPool.remove(path) if options.config[:uniq]
         progressbar.increment unless options.config[:quiet]
       end
     end
     
-    # don't run out of path to pass to jobs
-    if linkPool.pool.count < threads
+    # don't run out of links to give jobs
+    if linkPool.count < threads
       linkPool.reload
     end
 

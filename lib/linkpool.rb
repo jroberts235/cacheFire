@@ -18,8 +18,7 @@ end
 
 
 class LinkPool
-  attr_accessor( :count, :pool )
-
+  attr_accessor(:count, :pool)
   def initialize(options)
     @count   = 0
     @options = options
@@ -27,25 +26,34 @@ class LinkPool
     @pool    = ThreadSafe::Hash.new
   end
 
+  def fetch
+    path = @pool.keys.sample.dup
+    path.gsub!(/^/, '/') unless path.start_with?('/') 
+    return path
+  end
+
   def read
-    
-    if @options.config[:redis]
+    if @options.config[:redis] # get paths from redis
       redis = Redis.new
+      raise "Cannot reach local Redis server!" if redis == false
       redis.keys.each { |k| @pool[k] = 1 }
     else # readfile and populate the links Hash
-      r = ReadFile.new( @options )
+      r = ReadFile.new(@options)
       r.open 
       @pool = r.lines
     end
   end
 
+  def count
+    @pool.keys.count 
+  end
+
   def reload
-    self.read
     $log.info("Reloading paths from #{options.config[:filename]}")
+    self.read
   end
 
   def remove(path)
-    $log.info("Removing #{path} from pool")
     @pool.delete(path) 
     $log.info("Paths remaining: #{@pool.keys.count}")
   end
