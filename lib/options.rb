@@ -35,6 +35,12 @@ class Options
     :description => "Read the data from scour.dat and pick random URLs to hit",
     :default => false
 
+  option :redis,
+    :long => "--redis",
+    :boolean => true,
+    :description => "Read the data from a local Redis instead of a file",
+    :default => false
+
   option :links,
     :short => "-l number",
     :long => "--links number",

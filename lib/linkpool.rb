@@ -1,6 +1,7 @@
 $LOAD_PATH << './'
 require 'readfile.rb'
 require 'rest-client'
+require 'redis'
 
 
 class Net::HTTP::Purge < Net::HTTPRequest
@@ -27,10 +28,15 @@ class LinkPool
   end
 
   def read
-    # Call readfile and populate the links Hash
-    r = ReadFile.new( @options )
-    r.open 
-    @pool = r.lines
+    
+    if @options.config[:redis]
+      redis = Redis.new
+      redis.keys.each { |k| @pool[k] = 1 }
+    else # readfile and populate the links Hash
+      r = ReadFile.new( @options )
+      r.open 
+      @pool = r.lines
+    end
   end
 
   def reload

@@ -1,30 +1,28 @@
 require 'anemone'
+require 'redis'
 
 class Scour
   def initialize(url, threads, options)
-    file  = options.config[:file]
+    #file  = options.config[:file]
+    file = 'redis'
+    redis = Redis.new
 
     puts "Scouring #{url} using #{threads} threads and writing to #{file}"  unless options.config[:quiet]
-
-    # get rid of old scour data
-    dataFile = File.new file, "w"
-    dataFile.close
 
     progressbar = ProgressBar.create(:starting_at => 20,
                                      :total => nil)  unless options.config[:quiet]
     beginning_time = Time.now
     $log.info("Scour started at #{beginning_time}")
 
-    Anemone.crawl(url, :discard_page_bodies => true, :threads => threads) do |anemone|
+    Anemone.crawl(url, :threads => threads) do |anemone|
       anemone.on_every_page do |page|
         (page.links).each do |link|
 
-          next if link.to_s.include?('filter') or link == nil
+          # these are hard coded for my purpose
+          next if link.to_s.include?('filter') or link.to_s.include?('index') or link == nil
 
-          File.open(file, 'a') do |file|
-            file << "#{(link.to_s.split('/', 4))[3]}\n"
-            $log.info("Discovered: #{(link.to_s.split('/', 4))[3]}")
-          end
+          redis.set((link.to_s.split('/', 4))[3], 1) 
+          $log.info("Discovered: #{(link.to_s.split('/', 4))[3]}")
 
           progressbar.increment  unless options.config[:quiet]
         end
