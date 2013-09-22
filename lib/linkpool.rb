@@ -27,7 +27,9 @@ class LinkPool
   end
 
   def fetch
-    path = @pool.keys.sample.dup
+    wesley = @pool.keys.sample 
+    return if wesley == nil
+    path = wesley.dup 
     path.gsub!(/^/, '/') unless path.start_with?('/') 
     return path
   end
@@ -54,8 +56,9 @@ class LinkPool
   end
 
   def remove(path)
-    @pool.delete(path) 
-    $log.info("Paths remaining: #{@pool.keys.count}")
+    $log.info("Removing: #{path}")
+    @pool.delete(path[1..-1]) 
+    $log.info("Paths remaining: #{self.count}")
   end
 
   def purge 

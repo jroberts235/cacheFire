@@ -1,5 +1,5 @@
 def run_targeted(executor, threads, h, url, linkPool, options, stats)
-  puts "Heating cache to 100% using #{threads} thread(s)."  unless options.config[:quiet]
+  puts "Getting #{linkPool.count} links using #{threads} thread(s)." unless options.config[:quiet]
 
   progressbar = ProgressBar.create(:format => '%a %w',
                                    :starting_at => 0,
@@ -13,13 +13,15 @@ def run_targeted(executor, threads, h, url, linkPool, options, stats)
   # pull each link only once, then stop
   total.times do
     threads.times do
-      path = linkPool.fetch
-      raise "No path returned from linkPool.fetch" if path == nil
+      if linkPool.count >= 1 # stop if we run out of links
+        path = linkPool.fetch
+        raise "No path returned from linkPool.fetch" if path == nil
 
-      task = FutureTask.new(Job.new(h, url, linkPool, options, stats, path))
-      executor.execute(task)
-      tasks << task
-      linkPool.remove(path) 
+        task = FutureTask.new(Job.new(h, url, linkPool, options, stats, path))
+        executor.execute(task)
+        tasks << task
+        linkPool.remove(path) 
+      end
     end
     progressbar.progress= stats.ratio unless options.config[:quiet]
 
@@ -27,5 +29,13 @@ def run_targeted(executor, threads, h, url, linkPool, options, stats)
     tasks.each do |t|
       t.get
     end
+  end
+  # finish with some stats
+  unless options.config[:quiet]
+    stats.calc_ratio
+    puts "\n"
+    puts "Errors:         #{stats.errors.count}"
+    puts "Hit Avg:        #{(stats.hit_avg).round(3)}s"
+    puts "Miss Avg:       #{(stats.miss_avg.round(3))}s"
   end
 end
