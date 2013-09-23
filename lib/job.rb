@@ -29,8 +29,6 @@ class Job
 
     timer = (end_time - beginning_time)*1000
 
-    #@linkPool.remove(@path) if (@options.config[:uniq] or @options.config[:target])
-
     # check for and log any missing paths
     if res.get_fields('Status')
       if res.get_fields('Status').include?("404 Not Found") 

@@ -22,6 +22,12 @@ class Options
     :description => "scour URL and build data file?",
     :default => false
 
+  option :depth,
+    :short => "-d n",
+    :long => "--depth n",
+    :description => "Depth to scour to.",
+    :default => nil
+
   option :targeted,
     :short => "-T",
     :long => "--targeted",
@@ -39,7 +45,7 @@ class Options
   option :redis,
     :long => "--redis",
     :boolean => true,
-    :description => "Read the data from a local Redis instead of a file",
+    :description => "Use Redis as the input source instead of a file",
     :default => false
 
   option :links,
@@ -51,7 +57,7 @@ class Options
   option :file,
     :short => "-f name",
     :long => "--file name",
-    :description => "File name to find links in",
+    :description => "File name to use as the input source",
     :default => 'scour.dat'
 
   option :uniq,
@@ -62,7 +68,7 @@ class Options
 
   option :purge,
     :long => "--purge",
-    :description => "Purge the path's in the scour.dat file",
+    :description => "Purge all the path's contained in the input source",
     :boolean => true,
     :default => false
  

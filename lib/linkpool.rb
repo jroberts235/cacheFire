@@ -57,7 +57,7 @@ class LinkPool
 
   def remove(path)
     $log.info("Removing: #{path}")
-    @pool.delete(path[1..-1]) 
+    @pool.delete(path)
     $log.info("Paths remaining: #{self.count}")
   end
 
