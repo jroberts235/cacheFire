@@ -38,6 +38,7 @@ class LinkPool
     if @options.config[:redis] # get paths from redis
       redis = Redis.new
       raise "Cannot reach local Redis server!" if redis == false
+      $log.info(r.inspect)
       redis.keys.each { |k| @pool[k] = 1 }
     else # readfile and populate the links Hash
       r = ReadFile.new(@options)

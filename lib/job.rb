@@ -22,6 +22,7 @@ class Job
   def call
     beginning_time = Time.now
       req = Net::HTTP::Get.new(@path)
+      req['Host'] = 'm2.nastygal.com'
       req['Accept-Encoding'] = 'gzip,deflate' # this is important
       req['User-Agent'] = 'cacheFire'
       res = @h.request(req)
