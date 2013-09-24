@@ -68,6 +68,7 @@ begin
      :pool_timeout => 10,
      :warn_timeout => 0.25,
      :force_retry  => true,
+     :proxy_uri    => "http://www1.prod.nastygal.com"
      :url          => url,
      :port         => port )
 
