@@ -25,7 +25,7 @@ class Scour
                    :user_agent => "cacheFire",
                    :delay => 0,
                    :obey_robots_txt => false,
-                   :depth_limit => depth,
+                   :depth_limit => depth, if options.config[:depth]
                    :accept_cookies => false,
                    :skip_query_strings => false,
                    :read_timeout => nil ) do |anemone|
@@ -33,9 +33,11 @@ class Scour
         (page.links).each do |link|
 
           # I wanted to filter out some links
-          # these are hard coded for my purpose feel free to remove or adjust
+          # these are hard coded for my purpose. Feel free to remove or adjust.
+          # This can also be done by anemone as is probably better that way.
           next if link.to_s.include?('filter') or link.to_s.include?('index') or link == nil
 
+          link.split("?")[0] if link.include?("?") # remove search attrs
           path = ((link.to_s.split('/', 4))[3]).gsub!(/^/, '/') # extract the path from link 
           redis.set(path, 1) # set the value to arbitrary val (it's not used for anything)
           $log.info("Discovered: #{path}")
