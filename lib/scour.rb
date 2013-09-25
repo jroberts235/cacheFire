@@ -25,9 +25,9 @@ class Scour
                    :user_agent => "cacheFire",
                    :delay => 0,
                    :obey_robots_txt => false,
-                   :depth_limit => depth, if options.config[:depth]
+                   :depth_limit => depth, 
                    :accept_cookies => false,
-                   :skip_query_strings => false,
+                   :skip_query_strings => true,
                    :read_timeout => nil ) do |anemone|
       anemone.on_every_page do |page|
         (page.links).each do |link|
@@ -37,7 +37,6 @@ class Scour
           # This can also be done by anemone as is probably better that way.
           next if link.to_s.include?('filter') or link.to_s.include?('index') or link == nil
 
-          link.split("?")[0] if link.include?("?") # remove search attrs
           path = ((link.to_s.split('/', 4))[3]).gsub!(/^/, '/') # extract the path from link 
           redis.set(path, 1) # set the value to arbitrary val (it's not used for anything)
           $log.info("Discovered: #{path}")
