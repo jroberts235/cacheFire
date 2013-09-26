@@ -4,6 +4,7 @@ $LOAD_PATH << './lib'
 require 'ruby-progressbar'
 require 'logger'
 require 'java'
+require 'json'
 require 'scour.rb'
 require 'options.rb'
 require 'linkpool.rb'     
@@ -87,7 +88,7 @@ begin
     # dump out the 404's from this run
     File.delete('404s.json') if File.exists?('404s.json')
     File.open('404s.json', 'w') do |file|
-      stats.errors.each do |missing_link|
+      stats.errors.to_json.each do |missing_link|
         file.write("#{missing_link}")
       end
     end
