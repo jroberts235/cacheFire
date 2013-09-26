@@ -87,11 +87,8 @@ begin
 
     # dump out the 404's from this run
     File.delete('404s.json') if File.exists?('404s.json')
-    File.open('404s.json', 'w') do |file|
-      stats.errors.to_json.each do |missing_link|
-        file.write("#{missing_link}")
-      end
-    end
+    $stdout = File.open('path/to/file.txt', 'w')
+    puts myArray.to_json
 
   end
 ensure 
