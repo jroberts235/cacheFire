@@ -42,6 +42,7 @@ class LinkPool
       redis.keys.each { |k| @pool[k] = 1 }
     else # readfile and populate the links Hash
       r = ReadFile.new(@options)
+      r.open
       @pool = r.lines
     end
   end
