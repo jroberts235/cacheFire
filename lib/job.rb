@@ -13,16 +13,17 @@ class Job
    @options = options
      @stats = stats
       @path = path
+      @vhost = options.config[:vhost]
 
-    raise "No connection handle provide to the job!" if @h == nil
-    raise "No path provided to job!"    if @path == nil
-    raise "No url provided to the job!" if @url == nil
+    raise "No connection handle provided to the job!" if @h == nil
+    raise "No path provided to job!"                  if @path == nil
+    raise "No url provided to the job!"               if @url == nil
   end
 
   def call
     beginning_time = Time.now
       req = Net::HTTP::Get.new(@path)
-      req['Host'] = 'm2.nastygal.com'
+      req['Host'] = @vhost if @options.config[:vhost]
       req['Accept-Encoding'] = 'gzip,deflate' # this is important
       req['User-Agent'] = 'cacheFire'
       res = @h.request(req)
@@ -53,6 +54,7 @@ class Job
         $log.info("MISS(#{timer/1000}): #{@path}")
         @stats.miss(timer/1000)
       end
+    else $log.info("No 'X-Cache' Header Returned")
     end
   end
 end # end of class

@@ -68,7 +68,7 @@ class Options
 
   option :purge,
     :long => "--purge",
-    :description => "Purge all the path's contained in the input source",
+    :description => "Purge the entire cache!!!",
     :boolean => true,
     :default => false
  
@@ -77,6 +77,12 @@ class Options
     :long => "--Port number",
     :description => "Port to connect to",
     :default => 80
+
+  option :vhost,
+    :short => "-v name",
+    :long => "--vhost name",
+    :description => "Name to set the HOST header to.",
+    :default => nil
 
   option :quiet,
     :short => "-q",
