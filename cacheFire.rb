@@ -84,6 +84,14 @@ begin
       run_standard(executor, links, threads, h, url, linkPool, options, stats)
     end
 
+    # dump out the 404's from this run
+    File.delete('404s.json') if File.exists?('404s.json')
+    File.new('404s.json', 'w') do |file|
+      stats.errors.each do |error|
+        file.write(error)
+      end
+    end
+
   end
 ensure 
   executor.shutdown() if options.config[:retrieve]
