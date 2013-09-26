@@ -20,7 +20,6 @@ def run_standard(executor, links, threads, h, url, linkPool, options, stats)
         tasks << task
 
         linkPool.remove(path) if options.config[:uniq]
-        progressbar.increment unless options.config[:quiet]
       end
     end
     
@@ -31,6 +30,7 @@ def run_standard(executor, links, threads, h, url, linkPool, options, stats)
 
     # wait for all threads to complete
     tasks.each do |t|
+      progressbar.increment unless options.config[:quiet]
       t.get
     end
    end

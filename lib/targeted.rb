@@ -1,9 +1,9 @@
 def run_targeted(executor, threads, h, url, linkPool, options, stats)
   puts "Getting #{linkPool.count} links using #{threads} thread(s)." unless options.config[:quiet]
 
-  progressbar = ProgressBar.create(:format => '%a %w',
+  progressbar = ProgressBar.create(:format => '%a <%B> %p%% %t',
                                    :starting_at => 0,
-                                   :total => 100,
+                                   :total => linkPool.count,
                                    :smoothing => 0.8) unless options.config[:quiet]
 
   tasks = [] # array to track threads
@@ -23,10 +23,10 @@ def run_targeted(executor, threads, h, url, linkPool, options, stats)
         linkPool.remove(path) 
       end
     end
-    progressbar.progress= stats.ratio unless options.config[:quiet]
 
     # wait for all threads to complete
     tasks.each do |t|
+      progressbar.increment unless options.config[:quiet]
       t.get
     end
   end
