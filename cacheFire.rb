@@ -33,7 +33,7 @@ begin
   # create the thread pool for the executor
   executor = ThreadPoolExecutor.new(threads, # core_pool_treads
                                    (threads * 3),     # max_pool_threads
-                                   10,       # keep_alive_time
+                                   5,       # keep_alive_time
                                    TimeUnit::SECONDS,
                                    LinkedBlockingQueue.new )
 
@@ -66,7 +66,7 @@ begin
   h = PersistentHTTP.new(
      :name         => 'cacheFire',
      :pool_size    => 2048,
-     :pool_timeout => 10,
+     :pool_timeout => 2,
      :warn_timeout => 0.25,
      :force_retry  => false,
      #:proxy_uri    => "http://www1.prod.nastygal.com",
@@ -87,7 +87,7 @@ begin
 
     # dump out the 404's from this run
     File.delete('404s.json') if File.exists?('404s.json')
-    $stdout = File.open('path/to/file.txt', 'w')
+    $stdout = File.open('404s.json', 'w')
     puts myArray.to_json
 
   end
