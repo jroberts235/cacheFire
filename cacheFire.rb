@@ -88,7 +88,7 @@ begin
     # dump out the 404's from this run
     File.delete('404s.json') if File.exists?('404s.json')
     $stdout = File.open('404s.json', 'w')
-    puts myArray.to_json
+    puts stats.errors.to_json
 
   end
 ensure 
