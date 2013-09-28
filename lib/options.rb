@@ -35,6 +35,13 @@ class Options
     :description => "Pull every link once, thereby heating the cache 100%",
     :default => nil
 
+  option :flush,
+    :short => "-f",
+    :long => "--flush",
+    :boolean => true,
+    :description => "Use varnishadm to ban the entire cache before running (requires sudo)",
+    :default => false
+
   option :retrieve,
     :short => "-R",
     :long => "--retrieve",
