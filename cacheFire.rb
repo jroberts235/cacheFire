@@ -66,7 +66,7 @@ begin
   h = PersistentHTTP.new(
      :name         => 'cacheFire',
      :pool_size    => 2048,
-     :pool_timeout => 2,
+     :pool_timeout => 1,
      :warn_timeout => 0.25,
      :force_retry  => false,
      #:proxy_uri    => "http://www1.prod.nastygal.com",

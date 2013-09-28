@@ -27,10 +27,13 @@ def run_targeted(executor, threads, h, url, linkPool, options, stats)
     end
 
     # wait for all threads to complete
-    tasks.each do |t|
-      t.get
-    end
+    #tasks.each do |t|
+    #  t.get
+    #end
   end
+  puts "executor shutdown"
+  executor.shutdown() 
+
   # finish with some stats
   unless options.config[:quiet]
     stats.calc_ratio
