@@ -36,7 +36,6 @@ class Options
     :default => nil
 
   option :flush,
-    :short => "-f",
     :long => "--flush",
     :boolean => true,
     :description => "Use varnishadm to ban the entire cache before running (requires sudo)",
