@@ -6,7 +6,9 @@ java_import 'java.util.concurrent.Callable'
 
 class Job
   include Callable
-  def initialize(conn_handle, url, linkPool, options, stats, path)
+  def initialize(log, conn_handle, url, linkPool, options, stats, path)
+
+       @log = log
          @h = conn_handle
        @url = url
   @linkPool = linkPool
@@ -35,7 +37,7 @@ class Job
     if res.get_fields('Status')
       if res.get_fields('Status').include?("404 Not Found") 
         @stats.error(@path)
-        #$log.error("404: #{@path}")
+        @log.error("404: #{@path}")
         return
       end
     end
@@ -47,14 +49,14 @@ class Job
     # track hits for ratio calc
     if res.get_fields('X-Cache')
       if res.get_fields('X-Cache').include?("HIT")
-        #$log.info("HIT(#{timer/1000}): #{@path}")
+        @log.info("HIT(#{timer/1000}): #{@path}")
         @stats.hit(timer/1000)
         @stats.hits_incr
       else
-        #$log.info("MISS(#{timer/1000}): #{@path}")
+        @log.info("MISS(#{timer/1000}): #{@path}")
         @stats.miss(timer/1000)
       end
-    else #$log.info("No 'X-Cache' Header Returned")
+    else @log.info("No 'X-Cache' Header Returned")
     end
   end
 end # end of class

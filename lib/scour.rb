@@ -17,7 +17,7 @@ class Scour
                                      :total => nil)  unless options.config[:quiet]
 
     beginning_time = Time.now
-    $log.info("Scour started at #{beginning_time}")
+    @log.info("Scour started at #{beginning_time}")
 
     Anemone.crawl( url,
                    :discard_page_bodies => true,
@@ -39,7 +39,7 @@ class Scour
 
           path = ((link.to_s.split('/', 4))[3]).gsub!(/^/, '/') # extract the path from link 
           redis.set(path, 1) # set the value to arbitrary val (it's not used for anything)
-          $log.info("Discovered: #{path}")
+          @log.info("Discovered: #{path}")
 
           progressbar.increment  unless options.config[:quiet]
           counter += 1
@@ -49,6 +49,6 @@ class Scour
     end_time = Time.now
     timer = (end_time - beginning_time)/60
     puts "Finished in #{timer} minutes."
-    $log.info("#{counter} links Scoured in #{timer} minutes")
+    @log.info("#{counter} links Scoured in #{timer} minutes")
   end
 end
