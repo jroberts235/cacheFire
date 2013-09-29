@@ -1,11 +1,10 @@
 def run_targeted(executor, threads, h, url, linkPool, options, stats)
   puts "Getting #{linkPool.count} links using #{threads} thread(s)." unless options.config[:quiet]
 
+  # Ban all links in the cache
   if options.config[:flush]
-    raise "varnishadm not found!" unless File.exist?('/usr/bin/varnishadm')
-    system('sudo varnishadm -T :6082 "ban.url ." -S /etc/varnish/secret')
-    raise "Varnish ban did not succeed" unless $? == 1
-    $log.info("Banned entire cache.")
+    puts 'Banning all links currently in cache'
+    linkPool.purge
   end
 
   progressbar = ProgressBar.create(:format => '%a <%B> %c %t',

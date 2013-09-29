@@ -4,19 +4,6 @@ require 'rest-client'
 require 'redis'
 
 
-class Net::HTTP::Purge < Net::HTTPRequest
-  METHOD = 'PURGE'
-  REQUEST_HAS_BODY = false
-  RESPONSE_HAS_BODY = true
-end
-
-module RestClient
-  def self.purge(url, headers={}, &block)
-    Request.execute(:method => :purge, :url => url, :headers => headers, &block)
-  end
-end
-
-
 class LinkPool
   attr_accessor(:count, :pool)
   def initialize(options)
@@ -62,11 +49,10 @@ class LinkPool
     $log.info("Paths remaining: #{self.count}")
   end
 
-  def purge 
-    self.read
-    @pool.keys.each do |path|
-      $log.info("Purging #{@url + path}")
-      RestClient.purge "#{@url}:6081#{path}"
-    end
+  def purge
+    host = (@options.config[:url].split(/\/\//, 2))[1]
+    $log.info("Banning all current links!")
+    system("/usr/local/opt/varnish/bin/varnishadm -T #{host}:6082 -S /Users/jroberts/ruby/cacheFire/secret \"ban.url .\"")
+    raise "Banning operation failed!" unless $? == 0
   end
 end

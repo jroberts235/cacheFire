@@ -72,12 +72,6 @@ class Options
     :description => "Get every link only once",
     :default => false
 
-  option :purge,
-    :long => "--purge",
-    :description => "Purge the entire cache!!!",
-    :boolean => true,
-    :default => false
- 
   option :port,
     :short => "-p number",
     :long => "--Port number",
