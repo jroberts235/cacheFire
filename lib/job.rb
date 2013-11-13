@@ -35,6 +35,8 @@ class Job
 
         timer = (end_time - beginning_time)*1000
 
+        @log.info("#{timer}s: #{@path}"
+
         # check for and log any missing paths
         if res.get_fields('Status')
             if res.get_fields('Status').include?("404 Not Found") 
