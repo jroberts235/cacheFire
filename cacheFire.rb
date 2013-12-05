@@ -14,6 +14,7 @@ require 'varnish.rb'
 require 'standard.rb'
 require 'targeted.rb'
 require 'stats.rb'
+require 'process'
 
 java_import 'java.util.concurrent.FutureTask'
 java_import 'java.util.concurrent.LinkedBlockingQueue'
@@ -22,6 +23,9 @@ java_import 'java.util.concurrent.TimeUnit'
 
 
 begin
+    # Drop a pid file for this process
+    File.open("#{Process.pid}", 'w') { |file| file.write(Process.pid) }
+
     options = Options.new
     options.parse_options
          
