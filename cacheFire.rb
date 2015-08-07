@@ -1,6 +1,6 @@
 #! env jruby
 $LOAD_PATH << './lib'
-# test
+
 require 'ruby-progressbar'
 require 'logger'
 require 'java'
